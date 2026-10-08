@@ -25,4 +25,11 @@ export function rawDb(): Db {
   return globalForDb.reqoverDb
 }
 
+/** Closes the pool (tests and scripts only). */
+export async function closeDb() {
+  await globalForDb.reqoverSql?.end()
+  globalForDb.reqoverDb = undefined
+  globalForDb.reqoverSql = undefined
+}
+
 export type { Db }

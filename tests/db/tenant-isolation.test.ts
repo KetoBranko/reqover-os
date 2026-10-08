@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { eq, sql } from 'drizzle-orm'
 import { withUserTx, type RequestContext } from '@/server/db/context'
 import { auditLogs, companies, contacts, domainEvents, organizations } from '@/server/db/schema'
-import { rawDb } from '@/server/db/client'
+import { closeDb, rawDb } from '@/server/db/client'
 import { addMember, admin, createOrgFor, createUser, expectDbError } from '../support/db'
 
 let a: RequestContext
@@ -22,7 +22,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await admin.end()
-  await rawDb().$client.end()
+  await closeDb()
 })
 
 describe('tenant isolation (RLS)', () => {

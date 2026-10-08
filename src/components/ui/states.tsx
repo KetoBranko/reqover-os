@@ -1,4 +1,3 @@
-'use client'
 
 import { AlertTriangle, type LucideIcon } from 'lucide-react'
 import { Button } from './button'

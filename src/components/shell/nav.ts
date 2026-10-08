@@ -33,6 +33,7 @@ export const SECONDARY_NAV: NavItem[] = [
   { href: '/einstellungen', label: de.nav.settings, icon: Settings },
 ]
 
-export function isActive(pathname: string, href: string) {
+export function isActive(pathname: string | null, href: string) {
+  if (pathname == null) return false
   return href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`)
 }

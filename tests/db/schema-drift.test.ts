@@ -9,7 +9,7 @@ afterAll(() => admin.end())
 
 // SQL migrations are the source of truth; the Drizzle mirror must match them.
 describe('Drizzle schema matches the database', () => {
-  const tables = Object.values(schema).filter((v): v is PgTable => is(v, PgTableClass))
+  const tables = (Object.values(schema) as unknown[]).filter((v): v is PgTable => is(v, PgTableClass))
 
   it.each(tables.map((t) => [getTableName(t), t] as const))('%s', async (name, table) => {
     const config = getTableConfig(table)

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { LogOut, Menu } from 'lucide-react'
 import * as D from '@radix-ui/react-dialog'
 import { cn } from '@/lib/cn'
@@ -18,8 +18,13 @@ interface ShellProps {
   children: React.ReactNode
 }
 
+// The active-route highlight needs the URL, which is only known at request
+// time. Those parts read it behind Suspense so the shell itself stays static.
+function usePath() {
+  return usePathname()
+}
+
 export function AppShell({ userSlot, bannerSlot, topbarSlot, mobileCenterSlot, children }: ShellProps) {
-  const pathname = usePathname()
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[240px_1fr]">
       <aside className="sticky top-0 hidden h-dvh flex-col border-r border-line bg-surface/40 lg:flex">
@@ -28,13 +33,9 @@ export function AppShell({ userSlot, bannerSlot, topbarSlot, mobileCenterSlot, c
           <span className="text-sm font-semibold tracking-tight">ReQover OS</span>
         </div>
         <nav aria-label="Hauptnavigation" className="flex flex-1 flex-col gap-0.5 px-3 py-2">
-          {PRIMARY_NAV.map((item) => (
-            <SidebarLink key={item.href} item={item} active={isActive(pathname, item.href)} />
-          ))}
-          <div className="my-3 h-px bg-line" />
-          {SECONDARY_NAV.map((item) => (
-            <SidebarLink key={item.href} item={item} active={isActive(pathname, item.href)} />
-          ))}
+          <Suspense fallback={<SidebarLinks pathname={null} />}>
+            <ActiveSidebarLinks />
+          </Suspense>
         </nav>
         {userSlot}
       </aside>
@@ -52,8 +53,28 @@ export function AppShell({ userSlot, bannerSlot, topbarSlot, mobileCenterSlot, c
         </main>
       </div>
 
-      <MobileNav pathname={pathname} centerSlot={mobileCenterSlot} userSlot={userSlot} />
+      <Suspense fallback={<MobileNav pathname={null} centerSlot={mobileCenterSlot} userSlot={userSlot} />}>
+        <ActiveMobileNav centerSlot={mobileCenterSlot} userSlot={userSlot} />
+      </Suspense>
     </div>
+  )
+}
+
+function ActiveSidebarLinks() {
+  return <SidebarLinks pathname={usePath()} />
+}
+
+function SidebarLinks({ pathname }: { pathname: string | null }) {
+  return (
+    <>
+      {PRIMARY_NAV.map((item) => (
+        <SidebarLink key={item.href} item={item} active={isActive(pathname, item.href)} />
+      ))}
+      <div className="my-3 h-px bg-line" />
+      {SECONDARY_NAV.map((item) => (
+        <SidebarLink key={item.href} item={item} active={isActive(pathname, item.href)} />
+      ))}
+    </>
   )
 }
 
@@ -107,7 +128,11 @@ export function UserBlock({ name, organizationName }: { name: string; organizati
 
 const MOBILE_TABS = [PRIMARY_NAV[0]!, PRIMARY_NAV[5]!, PRIMARY_NAV[1]!]
 
-function MobileNav({ pathname, centerSlot, userSlot }: { pathname: string; centerSlot?: React.ReactNode; userSlot: React.ReactNode }) {
+function ActiveMobileNav(props: { centerSlot?: React.ReactNode; userSlot: React.ReactNode }) {
+  return <MobileNav pathname={usePath()} {...props} />
+}
+
+function MobileNav({ pathname, centerSlot, userSlot }: { pathname: string | null; centerSlot?: React.ReactNode; userSlot: React.ReactNode }) {
   const [open, setOpen] = useState(false)
   const more = [...PRIMARY_NAV.filter((i) => !MOBILE_TABS.includes(i)), ...SECONDARY_NAV]
   const [today, tasks, companies] = MOBILE_TABS

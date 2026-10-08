@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Field, Input } from '@/components/ui/input'
 import { supabaseBrowser } from '@/lib/supabase/browser'
+import { safeNext } from '@/lib/redirect'
 
-export function LoginForm({ next }: { next: string }) {
+export function LoginForm() {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
@@ -31,7 +32,7 @@ export function LoginForm({ next }: { next: string }) {
       )
       return
     }
-    router.replace(next)
+    router.replace(safeNext(new URLSearchParams(window.location.search).get('weiter')))
     router.refresh()
   }
 
@@ -55,3 +56,4 @@ export function LoginForm({ next }: { next: string }) {
     </form>
   )
 }
+
