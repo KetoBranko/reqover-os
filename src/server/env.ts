@@ -23,7 +23,9 @@ let cached: ServerEnv | undefined
 
 export function env(): ServerEnv {
   if (cached) return cached
-  const parsed = schema.safeParse(process.env)
+  // Claude Code cloud environments do not pass ANTHROPIC_API_KEY through to sessions,
+  // so the key may also be stored as REQOVER_ANTHROPIC_API_KEY.
+  const parsed = schema.safeParse({ ...process.env, ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY || process.env.REQOVER_ANTHROPIC_API_KEY })
   if (!parsed.success) {
     const fields = parsed.error.issues.map((i) => i.path.join('.')).join(', ')
     throw new Error(`Ungültige oder fehlende Umgebungsvariablen: ${fields}. Siehe .env.example.`)
