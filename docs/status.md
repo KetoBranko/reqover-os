@@ -23,3 +23,12 @@ Offene Punkte: keine Blocker. Seiten außer Übersicht folgen in Phase 3.
 - Tests: 6 Unit, 43 DB (neu: CRM-Services, Mandantengrenzen bei Verknüpfungen, Suche), E2E Desktop + Mobil: Unternehmen → Kontakt → Aufgabe → Notiz → Reload → Suche → erledigen → ⌘K → löschen. E2E nutzt ein eigenes Konto mit eigener Organisation.
 
 Offene Punkte: Spalte „Pipeline“ in der Unternehmensliste bleibt leer, bis Phase 4 Chancen anlegt.
+
+## Phase 4 – Vertriebspipeline · abgeschlossen 08.10.2026
+
+- Board mit den 9 Phasen; Desktop: Drag & Drop (auch per Tastatur) plus Menü „Phase ändern“ an jeder Karte; Mobil: gruppierte Liste mit Phasen-Auswahl
+- Karten zeigen Unternehmen, Wert, Ansprechpartner, nächsten Schritt (überfällig rot), Hinweis bei fehlendem nächsten Schritt und bei ≥ 14 Tagen in derselben Phase; Spaltensummen und offener Gesamtwert
+- Datenqualität (Spec 34: unterstützen, nicht bevormunden): „Gewonnen“ fragt nach dem Datum der Auftragsbestätigung und bietet „Trotzdem als gewonnen markieren“ (wird als `won_without_order` gespeichert, im Verlauf vermerkt und auf der Karte angezeigt); „Verloren“ nur mit Grund (Schnellauswahl). Durchgesetzt in Service **und** Datenbank-Trigger (Migrationen 0003/0004), der auch prüft, dass die Phase zur Pipeline der Organisation gehört, und `stage_changed_at`/`closed_at` selbst pflegt
+- Jeder Phasenwechsel schreibt einen Verlaufseintrag und Events (`OPPORTUNITY_STAGE_CHANGED`, `PILOT_PROPOSED`, `PILOT_WON`, `PILOT_LOST`)
+- Chancen-Tab in der Unternehmens-360°-Sicht; Schnellaktion „Neue Chance anlegen“ in der Befehlsleiste; Demo-Seed um 4 Chancen erweitert
+- Tests: 50 DB (neu: 7 Pipeline-Tests inkl. direkter Datenbank-Umgehungsversuche), E2E Desktop + Mobil: anlegen → ziehen → Menü → Gewonnen-Dialog → Verloren mit Grund → Reload → Verlauf
