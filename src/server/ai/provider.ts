@@ -21,9 +21,41 @@ export interface StructuredResult<T> {
   model: string
 }
 
+export interface ToolDefinition {
+  name: string
+  description: string
+  schema: z.ZodType
+}
+
+export interface ToolCall {
+  id: string
+  name: string
+  input: unknown
+}
+
+/** Provider-neutral chat history. Tool results are plain text (compact JSON). */
+export type ChatMessage =
+  | { role: 'user'; text: string }
+  | { role: 'assistant'; text: string; toolCalls: ToolCall[] }
+  | { role: 'tool'; results: { id: string; name: string; content: string }[] }
+
+export interface ChatRequest {
+  task: AITask
+  system: string
+  messages: ChatMessage[]
+  tools: ToolDefinition[]
+}
+
+export interface ChatTurn {
+  text: string
+  toolCalls: ToolCall[]
+  model: string
+}
+
 export interface AIProvider {
   readonly id: 'anthropic' | 'fake'
   generateStructured<T>(req: StructuredRequest<T>): Promise<StructuredResult<T>>
+  chat(req: ChatRequest): Promise<ChatTurn>
 }
 
 export type AIStatus = { available: true; provider: AIProvider['id'] } | { available: false; reason: string }

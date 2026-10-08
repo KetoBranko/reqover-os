@@ -83,3 +83,17 @@ Offene Punkte: Die Gewichte sind ein erster Vorschlag und liegen zentral in `REA
 - Tests: 22 Unit, 70 DB (neu: Analyse ändert nichts, Auswahl/Bearbeitung, Audit, Manipulationsversuche, Mandantentrennung), 10 E2E (neu: analysieren → bearbeiten → übernehmen → Reload → Aufgabe und Verlauf)
 
 Offene Punkte: Für echten Betrieb fehlt `ANTHROPIC_API_KEY` (von Branko anzulegen). Assistent und freie Befehle folgen in der nächsten Phase.
+
+## Phase 8 – ReQover Assistent und freie Befehle · abgeschlossen 08.10.2026
+
+- `/assistent`: Chat, der nur auf Basis der eigenen Daten antwortet; jede Antwort nennt ihre Datenbasis („Datenbasis: Priorisierung“). Fehlen Daten, kommt „Dazu liegen mir noch keine ausreichenden Daten vor.“ Gespräche werden gespeichert („Neues Gespräch“ beginnt ein frisches)
+- Lesen und Schreiben sind getrennt:
+  - Lese-Werkzeuge (`src/server/ai/assistant-tools.ts`): heute priorisiert, Suche, Unternehmenskontext, Kontaktverlauf, Pipeline, Unternehmen filtern (Bedarf bestätigt, ohne nächsten Schritt, Evidence ab), Aufgaben, Validierung. Alle laufen mit dem RLS-Kontext des Nutzers
+  - Vorschlags-Werkzeuge: Aufgabe, Notiz, Phasenwechsel. Sie schreiben nichts, sondern sammeln einen `ai_action_proposal` pro Antwort
+- Im Chat erscheint „Ich würde folgende Änderungen durchführen: …“ mit [Übernehmen] [Bearbeiten] [Verwerfen]. „Bearbeiten“ öffnet `/vorschlaege/[id]` (Auswahl und Felder änderbar). Übernehmen nutzt denselben transaktionalen Weg wie Phase 7 (Audit `actor = ai`, Verlaufseintrag, Events)
+- „Gewonnen“ ohne dokumentierten Auftrag: Der Assistent weist darauf hin; übernommen wird nur mit Auftragsdatum oder dem ausdrücklichen Haken „Trotzdem als gewonnen markieren“. „Verloren“ verlangt einen Grund
+- Befehlsleiste: Ab drei Zeichen gibt es „ReQover fragen: „…““; Suchtreffer und Schnellaktionen haben Vorrang, freier Text ohne Treffer geht mit Enter an den Assistenten
+- Ohne eingerichtete AI zeigt `/assistent` ehrlich „Assistent nicht verfügbar“ mit Grund
+- Tests: 22 Unit, 75 DB (neu: Mandantentrennung der Werkzeuge und Gespräche, Vorschlag statt Schreiben, Bestätigung legt Aufgabe an, „Gewonnen“-Regel), 12 E2E (neu: Frage beantworten → Aufgabe über die Befehlsleiste vorschlagen → vorher nicht vorhanden → Übernehmen → Aufgabe vorhanden)
+
+Offene Punkte: Antworten im echten Betrieb hängen am `ANTHROPIC_API_KEY`; im Testmodus antwortet ein regelbasierter Platzhalter. Spracheingabe im Assistenten folgt mit Phase 9.

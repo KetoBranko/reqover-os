@@ -248,3 +248,12 @@ export async function getPreparation(ctx: RequestContext, companyId: string) {
     }
   })
 }
+
+/** Priorities without touching the visit baseline (used by the assistant). */
+export async function getPriorities(ctx: RequestContext) {
+  const today = berlinDay()
+  return withUserTx(ctx, async (tx) => {
+    const input = await loadBriefingInput(tx, ctx, today)
+    return { today, input, items: prioritize(input), counts: countDue(input) }
+  })
+}

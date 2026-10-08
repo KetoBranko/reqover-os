@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { env } from '@/server/env'
 import { logger } from '@/server/logger'
 import { DomainError } from '@/server/action'
-import { modelFor, type AIProvider, type StructuredRequest } from './provider'
+import { modelFor, type AIProvider, type ChatMessage, type ChatRequest, type StructuredRequest } from './provider'
 
 let client: Anthropic | undefined
 
@@ -36,9 +36,43 @@ export function anthropicProvider(): AIProvider {
         return { data: parsed.data, model }
       } catch (e) {
         if (e instanceof DomainError) throw e
-        logger.error('ai.request_failed', { model, error: e instanceof Error ? e : String(e) })
-        throw new DomainError('unavailable', 'Die AI ist gerade nicht erreichbar. Bitte später erneut versuchen.')
+        throw failed(model, e)
+      }
+    },
+    async chat(req: ChatRequest) {
+      const model = modelFor(req.task)
+      try {
+        const res = await api.messages.create({
+          model,
+          max_tokens: 2000,
+          system: req.system,
+          tools: req.tools.map((t) => ({ name: t.name, description: t.description, input_schema: z.toJSONSchema(t.schema, { target: 'draft-7' }) as Anthropic.Tool.InputSchema })),
+          messages: toAnthropic(req.messages),
+        })
+        const text = res.content.flatMap((b) => (b.type === 'text' ? [b.text] : [])).join('\n').trim()
+        const toolCalls = res.content.flatMap((b) => (b.type === 'tool_use' ? [{ id: b.id, name: b.name, input: b.input }] : []))
+        return { text, toolCalls, model }
+      } catch (e) {
+        throw failed(model, e)
       }
     },
   }
+}
+
+function failed(model: string, e: unknown) {
+  logger.error('ai.request_failed', { model, error: e instanceof Error ? e : String(e) })
+  return new DomainError('unavailable', 'Die AI ist gerade nicht erreichbar. Bitte später erneut versuchen.')
+}
+
+function toAnthropic(messages: ChatMessage[]): Anthropic.MessageParam[] {
+  return messages.map((m) => {
+    if (m.role === 'user') return { role: 'user', content: m.text }
+    if (m.role === 'tool') {
+      return { role: 'user', content: m.results.map((r) => ({ type: 'tool_result' as const, tool_use_id: r.id, content: r.content })) }
+    }
+    const content: Anthropic.ContentBlockParam[] = []
+    if (m.text) content.push({ type: 'text', text: m.text })
+    for (const c of m.toolCalls) content.push({ type: 'tool_use', id: c.id, name: c.name, input: c.input })
+    return { role: 'assistant', content }
+  })
 }

@@ -60,10 +60,10 @@ describe('AI-Extraktion → Vorschläge', () => {
   })
 
   it('Bearbeitungen dürfen Identität, Zitat und Frage nicht ändern', () => {
-    const [a] = buildActions({ ...empty, answers: [{ questionKey: 'quotes_per_month', answer: '30-40', quote: null, certainty: 'sicher' }] }, ctx).actions
-    expect(a!.type).toBe('discovery.answer')
-    const edited = mergeAccepted(a!, { ...a!, quote: 'gefälscht', questionKey: 'crm', value: { min: 10, max: 20 } } as typeof a)
+    const a = buildActions({ ...empty, answers: [{ questionKey: 'quotes_per_month', answer: '30-40', quote: null, certainty: 'sicher' }] }, ctx).actions[0]!
+    expect(a.type).toBe('discovery.answer')
+    const edited = mergeAccepted(a, { ...a, quote: 'gefälscht', questionKey: 'crm', value: { min: 10, max: 20 } } as typeof a)
     expect(edited).toMatchObject({ quote: null, questionKey: 'quotes_per_month', value: { min: 10, max: 20 } })
-    expect(mergeAccepted(a!, { ...a!, value: 'Text' } as typeof a)).toBeNull()
+    expect(mergeAccepted(a, { ...a, value: 'Text' } as typeof a)).toBeNull()
   })
 })
