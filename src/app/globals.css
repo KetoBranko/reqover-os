@@ -1,26 +1,115 @@
 @import "tailwindcss";
 
+/* ReQover design tokens. Dark is primary; light is prepared via data-theme. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #0d0f13;
+  --surface: #14171d;
+  --surface-2: #1a1e25;
+  --surface-3: #222731;
+  --border: rgb(255 255 255 / 0.07);
+  --border-strong: rgb(255 255 255 / 0.13);
+  --text: #e7e9ee;
+  --text-muted: #a0a7b4;
+  --text-faint: #6c7381;
+  --accent: #6cc3e0;
+  --accent-strong: #8fd3ea;
+  --accent-soft: rgb(108 195 224 / 0.12);
+  --accent-contrast: #06212b;
+  --success: #57c78f;
+  --success-soft: rgb(87 199 143 / 0.12);
+  --warning: #e3b35d;
+  --warning-soft: rgb(227 179 93 / 0.12);
+  --danger: #e8776f;
+  --danger-soft: rgb(232 119 111 / 0.12);
+  --focus: #8fd3ea;
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-2: #f1f3f6;
+  --surface-3: #e7eaef;
+  --border: rgb(15 23 42 / 0.08);
+  --border-strong: rgb(15 23 42 / 0.16);
+  --text: #12151b;
+  --text-muted: #4b5361;
+  --text-faint: #7b8391;
+  --accent: #1f7fa3;
+  --accent-strong: #176a89;
+  --accent-soft: rgb(31 127 163 / 0.1);
+  --accent-contrast: #ffffff;
+  --success: #1d8a57;
+  --success-soft: rgb(29 138 87 / 0.1);
+  --warning: #a86c0f;
+  --warning-soft: rgb(168 108 15 / 0.1);
+  --danger: #c2413a;
+  --danger-soft: rgb(194 65 58 / 0.1);
+  --focus: #1f7fa3;
+  color-scheme: light;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-fg: var(--text);
+  --color-muted: var(--text-muted);
+  --color-faint: var(--text-faint);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-contrast: var(--accent-contrast);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-feature-settings: "cv11", "ss01";
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hypotheses and interpretations are marked by a dashed rule plus a text label, not by colour alone. */
+.mark-fact {
+  border-left: 2px solid var(--text-muted);
+}
+.mark-hypothesis {
+  border-left: 2px dashed var(--warning);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
 }

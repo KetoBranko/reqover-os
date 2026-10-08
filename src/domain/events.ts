@@ -1,0 +1,22 @@
+// Domain event types. Stable keys; automations will subscribe to these.
+export const DOMAIN_EVENTS = [
+  'COMPANY_CREATED',
+  'COMPANY_STATUS_CHANGED',
+  'CONTACT_CREATED',
+  'DISCOVERY_STARTED',
+  'DISCOVERY_COMPLETED',
+  'EVIDENCE_SCORE_CONFIRMED',
+  'PAIN_CONFIRMED',
+  'OPPORTUNITY_CREATED',
+  'OPPORTUNITY_STAGE_CHANGED',
+  'PILOT_PROPOSED',
+  'PILOT_WON',
+  'PILOT_LOST',
+  'TASK_CREATED',
+  'TASK_COMPLETED',
+  'AI_PROPOSAL_CREATED',
+  'AI_PROPOSAL_APPLIED',
+  'AI_PROPOSAL_REJECTED',
+] as const
+
+export type DomainEventType = (typeof DOMAIN_EVENTS)[number]
