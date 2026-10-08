@@ -89,7 +89,7 @@ async function Review({ id, proposalId }: { id: string; proposalId: string }) {
             </details>
           )}
           {actions.length === 0 && <p className="mb-4 text-sm text-muted">In den Notizen war nichts, das ich sicher zuordnen konnte.</p>}
-          <ProposalReview proposalId={proposalId} discoveryId={id} actions={actions} current={data.current ?? {}} />
+          <ProposalReview proposalId={proposalId} returnTo={`/discovery/${id}`} actions={actions} current={data.current ?? {}} />
         </>
       )}
     </>

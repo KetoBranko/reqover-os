@@ -17,12 +17,12 @@ import {
 import { SIGNALS, type AnswerType } from '@/domain/discovery'
 import { getProvider } from '@/server/ai/provider'
 import { EXTRACTION_SYSTEM, extractionInput } from '@/server/ai/prompts'
-import { insightInput, taskInput, opportunityInput } from '@/domain/schemas'
+import { insightInput, taskInput, opportunityInput, opportunityMove } from '@/domain/schemas'
 import { recordActivity } from './activities'
 import { saveAnswer, setSignal, updateDiscoveryNotes } from './discovery'
 import { createInsight } from './insights'
 import { createTask } from './tasks'
-import { createOpportunity } from './opportunities'
+import { createOpportunity, moveOpportunity } from './opportunities'
 
 export interface ProposalMeta {
   dropped: string[]
@@ -156,14 +156,42 @@ const LABEL: Record<ProposalAction['type'], string> = {
   'evidence.score': 'Evidence Score bewertet',
   'insight.create': 'Erkenntnis gespeichert',
   'task.create': 'Aufgabe erstellt',
+  'activity.note': 'Notiz gespeichert',
+  'opportunity.stage': 'Phase geändert',
   'opportunity.create': 'Chance angelegt',
   'opportunity.next_step': 'Nächster Schritt aktualisiert',
 }
 
-async function execute(tx: Tx, ctx: RequestContext, proposalId: string, d: typeof discoveryInterviews.$inferSelect, a: ProposalAction) {
+type Discovery = typeof discoveryInterviews.$inferSelect
+
+async function execute(tx: Tx, ctx: RequestContext, proposalId: string, discovery: Discovery | null, a: ProposalAction) {
   const opts = { actor: 'ai' as const, proposalId }
   const uncertain = a.certainty === 'unsicher'
+  // Assistant proposals have no discovery; only the actions below that need one read it.
+  const needsDiscovery = () => {
+    if (!discovery) throw new DomainError('validation', 'Dieser Vorschlag gehört zu keinem Gespräch.')
+    return discovery
+  }
+  if (!discovery) {
+    switch (a.type) {
+      case 'task.create':
+        return createTask(tx, ctx, taskInput.parse({ title: a.title, dueDate: a.dueDate, context: a.context, companyId: a.companyId ?? null }), opts)
+      case 'activity.note':
+        return recordActivity(tx, ctx, { type: 'note', title: 'Notiz', body: a.body, companyId: a.companyId }, opts)
+      case 'opportunity.stage':
+        return moveOpportunity(
+          tx,
+          ctx,
+          opportunityMove.parse({ id: a.opportunityId, stageKey: a.to, orderConfirmedAt: a.orderConfirmedAt, wonWithoutOrder: a.wonWithoutOrder, lostReason: a.lostReason }),
+          opts,
+        )
+    }
+  }
+  const d = needsDiscovery()
   switch (a.type) {
+    case 'activity.note':
+    case 'opportunity.stage':
+      throw new DomainError('validation', 'Diese Änderung gehört nicht zu einem Gespräch.')
     case 'discovery.field':
       return updateDiscoveryNotes(tx, d.id, { [a.field]: a.value })
     case 'discovery.list_add': {
@@ -248,7 +276,6 @@ export async function applyProposal(ctx: RequestContext, decision: ProposalDecis
       const [p] = await tx.select().from(aiActionProposals).where(and(eq(aiActionProposals.id, decision.proposalId), eq(aiActionProposals.organizationId, ctx.organizationId))).for('update')
       if (!p) throw new DomainError('not_found', de.errors.notFound)
       if (p.status !== 'pending') throw new DomainError('conflict', 'Dieser Vorschlag wurde bereits entschieden.')
-      if (!p.discoveryId) throw new DomainError('validation', 'Dieser Vorschlag gehört zu keinem Gespräch.')
       const stored = proposalActions.parse(p.actions)
       const byId = new Map(stored.map((a) => [a.id, a]))
       const accepted: ProposalAction[] = []
@@ -258,18 +285,18 @@ export async function applyProposal(ctx: RequestContext, decision: ProposalDecis
         if (!merged) throw new DomainError('validation', 'Ein Vorschlag wurde ungültig verändert. Bitte die Seite neu laden.')
         accepted.push(merged)
       }
-      const [d] = await tx.select().from(discoveryInterviews).where(eq(discoveryInterviews.id, p.discoveryId))
-      if (!d) throw new DomainError('not_found', de.errors.notFound)
-      if (d.status === 'completed' && accepted.length) {
+      const [d] = p.discoveryId ? await tx.select().from(discoveryInterviews).where(eq(discoveryInterviews.id, p.discoveryId)) : [null]
+      if (p.discoveryId && !d) throw new DomainError('not_found', de.errors.notFound)
+      if (d?.status === 'completed' && accepted.length) {
         throw new DomainError('conflict', 'Das Gespräch ist abgeschlossen. Zum Übernehmen zuerst „Bearbeiten“ wählen.')
       }
       // Answers and signals first, then everything that reads them (e.g. the opportunity's stage).
-      const order: ProposalAction['type'][] = ['discovery.field', 'discovery.list_add', 'discovery.answer', 'discovery.signal', 'evidence.score', 'insight.create', 'task.create', 'opportunity.next_step', 'opportunity.create']
+      const order: ProposalAction['type'][] = ['discovery.field', 'discovery.list_add', 'discovery.answer', 'discovery.signal', 'evidence.score', 'insight.create', 'task.create', 'activity.note', 'opportunity.stage', 'opportunity.next_step', 'opportunity.create']
       accepted.sort((a, b) => order.indexOf(a.type) - order.indexOf(b.type))
-      let current = d
+      let current = d ?? null
       for (const a of accepted) {
         await execute(tx, ctx, p.id, current, a)
-        if (a.type === 'discovery.signal') current = { ...current, [SIGNALS.find((s) => s.key === a.signal)!.field]: a.value }
+        if (current && a.type === 'discovery.signal') current = { ...current, [SIGNALS.find((s) => s.key === a.signal)!.field]: a.value }
       }
 
       const status = accepted.length === 0 ? 'rejected' : accepted.length === stored.length ? 'applied' : 'partially_applied'
@@ -294,16 +321,16 @@ export async function applyProposal(ctx: RequestContext, decision: ProposalDecis
             type: 'ai_action',
             title: `AI-Vorschlag übernommen: ${accepted.length} von ${stored.length} Änderungen`,
             body: [...counts].map(([label, n]) => `✓ ${label}${n > 1 ? ` (${n})` : ''}`).join('\n') + '\nVorgeschlagen durch ReQover AI, bestätigt durch dich.',
-            companyId: d.companyId,
-            contactId: d.contactId,
-            discoveryId: d.id,
+            companyId: d?.companyId ?? p.companyId,
+            contactId: d?.contactId ?? null,
+            discoveryId: d?.id ?? null,
             metadata: { proposalId: p.id, accepted: accepted.length, total: stored.length, edited: edits.length, confirmedBy: ctx.userId },
           },
           { actor: 'ai', proposalId: p.id },
         )
       }
-      await emitEvent(tx, ctx, accepted.length ? 'AI_PROPOSAL_APPLIED' : 'AI_PROPOSAL_REJECTED', { proposalId: p.id, discoveryId: d.id, accepted: accepted.length, total: stored.length }, { actor: 'human', proposalId: p.id })
-      return { status, accepted: accepted.length, total: stored.length, discoveryId: d.id }
+      await emitEvent(tx, ctx, accepted.length ? 'AI_PROPOSAL_APPLIED' : 'AI_PROPOSAL_REJECTED', { proposalId: p.id, discoveryId: d?.id ?? null, accepted: accepted.length, total: stored.length }, { actor: 'human', proposalId: p.id })
+      return { status, accepted: accepted.length, total: stored.length, discoveryId: d?.id ?? null }
     },
     { actor: 'ai', proposalId: decision.proposalId },
   )

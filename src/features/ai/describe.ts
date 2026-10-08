@@ -51,7 +51,15 @@ export function describeAction(a: ProposalAction): { group: GroupKey; label: str
     case 'insight.create':
       return { group: 'insights', label: a.kind === 'fact' ? 'Fakt' : a.kind === 'interpretation' ? 'Interpretation' : 'Kundenaussage', text: a.statement }
     case 'task.create':
-      return { group: 'next', label: 'Aufgabe', text: [a.title, a.dueDate && `fällig ${formatDay(a.dueDate)}`].filter(Boolean).join(' · ') }
+      return { group: 'next', label: a.companyName ? `Aufgabe · ${a.companyName}` : 'Aufgabe', text: [a.title, a.dueDate && `fällig ${formatDay(a.dueDate)}`].filter(Boolean).join(' · ') }
+    case 'activity.note':
+      return { group: 'insights', label: `Notiz · ${a.companyName}`, text: a.body }
+    case 'opportunity.stage':
+      return {
+        group: 'next',
+        label: `Phase · ${a.companyName}`,
+        text: [`${a.opportunityTitle}: ${de.pipelineStage[a.from]} → ${de.pipelineStage[a.to]}`, a.to === 'lost' && a.lostReason && `Grund: ${a.lostReason}`].filter(Boolean).join(' · '),
+      }
     case 'opportunity.create':
       return {
         group: 'next',

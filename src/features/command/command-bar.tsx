@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Command } from 'cmdk'
 import * as D from '@radix-ui/react-dialog'
-import { Building2, CheckSquare, Columns3, MessagesSquare, CornerDownLeft, Search, User, UserPlus, Plus, type LucideIcon } from 'lucide-react'
+import { Building2, CheckSquare, Columns3, MessagesSquare, CornerDownLeft, Search, Sparkles, User, UserPlus, Plus, type LucideIcon } from 'lucide-react'
 import { PRIMARY_NAV, SECONDARY_NAV } from '@/components/shell/nav'
 import { formatDay } from '@/lib/format'
 import { de } from '@/i18n/de'
@@ -38,7 +38,7 @@ const QUICK_ACTIONS: { label: string; href: string; icon: LucideIcon; keywords: 
 const HIT_ICON: Record<SearchHit['kind'], LucideIcon> = { company: Building2, contact: User, task: CheckSquare }
 const HIT_GROUP: Record<SearchHit['kind'], string> = { company: de.nav.companies, contact: de.nav.contacts, task: 'Offene Aufgaben' }
 
-/** ⌘K / Ctrl+K: navigation, quick actions and global search. Free-text commands follow with the AI layer. */
+/** ⌘K / Ctrl+K: navigation, quick actions, global search, and free text handed to the assistant. */
 export function CommandBar() {
   const router = useRouter()
   const [open, setOpen] = useState(false)
@@ -112,15 +112,18 @@ export function CommandBar() {
                 <Command.Input
                   value={query}
                   onValueChange={onQueryChange}
-                  placeholder="Unternehmen, Kontakt oder Aktion suchen …"
+                  placeholder="Suchen, Aktion wählen oder ReQover fragen …"
                   className="h-12 flex-1 bg-transparent text-[15px] text-fg outline-none placeholder:text-faint"
                 />
                 {searching && <span className="text-[12px] text-faint">{de.common.loading}</span>}
               </div>
               <Command.List className="max-h-[60vh] overflow-y-auto p-2">
-                <Command.Empty className="px-3 py-6 text-center text-sm text-muted">
-                  {query.trim().length < 2 ? 'Tippe mindestens zwei Zeichen.' : searching ? de.common.loading : 'Keine Treffer.'}
-                </Command.Empty>
+                {/* From three characters the assistant entry is always offered, so there is no empty state. */}
+                {query.trim().length < 3 && (
+                  <Command.Empty className="px-3 py-6 text-center text-sm text-muted">
+                    {query.trim().length < 2 ? 'Tippe mindestens zwei Zeichen.' : searching ? de.common.loading : 'Keine Treffer.'}
+                  </Command.Empty>
+                )}
 
                 {groups.map((g) => (
                   <Command.Group key={g.kind} heading={HIT_GROUP[g.kind]} className={GROUP}>
@@ -157,10 +160,19 @@ export function CommandBar() {
                     </Command.Item>
                   ))}
                 </Command.Group>
+
+                {query.trim().length >= 3 && (
+                  <Command.Group heading="Assistent" className={GROUP} forceMount>
+                    <Command.Item value="ReQover fragen" forceMount onSelect={() => go(`/assistent?frage=${encodeURIComponent(query.trim())}`)} className={ITEM}>
+                      <Sparkles className="size-4 text-accent" aria-hidden />
+                      <span className="min-w-0 flex-1 truncate">ReQover fragen: „{query.trim()}“</span>
+                    </Command.Item>
+                  </Command.Group>
+                )}
               </Command.List>
               <div className="hidden items-center justify-between border-t border-line px-4 py-2 text-[11px] text-faint sm:flex">
                 <span>↑↓ auswählen · ↵ öffnen · Esc schließen</span>
-                <span>Freitext-Befehle: {de.common.comingSoon}</span>
+                <span>Freitext stellt eine Frage an ReQover</span>
               </div>
             </Command>
           </D.Content>

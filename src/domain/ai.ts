@@ -10,6 +10,7 @@
 import { z } from 'zod'
 import { EVIDENCE_CATEGORIES, SIGNAL_KEYS, isValidAnswer, parseRange, type AnswerType, type EvidenceCategory, type SignalKey } from './discovery'
 import { parseMoneyToCents } from '@/lib/format'
+import { PIPELINE_STAGE_KEYS } from './schemas'
 
 const day = z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
 const certainty = z.enum(['sicher', 'unsicher']).describe('„unsicher“, wenn der Text die Angabe nur andeutet, schätzt oder widersprüchlich ist')
@@ -88,7 +89,29 @@ export const proposalAction = z.discriminatedUnion('type', [
   z.object({ ...base, type: z.literal('discovery.signal'), signal: z.enum(SIGNAL_KEYS), value: z.enum(['yes', 'no', 'unclear']) }),
   z.object({ ...base, type: z.literal('evidence.score'), category: z.enum(EVIDENCE_CATEGORIES), points: z.number().int().min(0).max(2), rationale: z.string().min(1).max(1000) }),
   z.object({ ...base, type: z.literal('insight.create'), kind: z.enum(INSIGHT_KINDS), statement: z.string().min(1).max(2000) }),
-  z.object({ ...base, type: z.literal('task.create'), title: z.string().min(1).max(300), dueDate: day.nullable(), context: z.string().max(2000).nullable() }),
+  z.object({
+    ...base,
+    type: z.literal('task.create'),
+    title: z.string().min(1).max(300),
+    dueDate: day.nullable(),
+    context: z.string().max(2000).nullable(),
+    /** Only for proposals outside a discovery (assistant); a discovery's tasks belong to its company. */
+    companyId: z.uuid().nullable().optional(),
+    companyName: z.string().max(200).nullable().optional(),
+  }),
+  z.object({ ...base, type: z.literal('activity.note'), companyId: z.uuid(), companyName: z.string().max(200), body: z.string().min(1).max(5000) }),
+  z.object({
+    ...base,
+    type: z.literal('opportunity.stage'),
+    opportunityId: z.uuid(),
+    opportunityTitle: z.string().max(200),
+    companyName: z.string().max(200),
+    from: z.enum(PIPELINE_STAGE_KEYS),
+    to: z.enum(PIPELINE_STAGE_KEYS),
+    orderConfirmedAt: day.nullable(),
+    wonWithoutOrder: z.boolean(),
+    lostReason: z.string().max(1000).nullable(),
+  }),
   z.object({
     ...base,
     type: z.literal('opportunity.create'),
@@ -108,6 +131,8 @@ export const proposalAction = z.discriminatedUnion('type', [
 ])
 export type ProposalAction = z.infer<typeof proposalAction>
 export type ProposalActionType = ProposalAction['type']
+/** A proposal action before it gets its id (distributive over the union). */
+export type NewProposalAction = ProposalAction extends infer A ? (A extends unknown ? Omit<A, 'id'> : never) : never
 export const proposalActions = z.array(proposalAction).max(150)
 
 /** Decision per action id, sent from the review screen. `action` carries the (possibly edited) item. */
@@ -289,5 +314,11 @@ export function mergeAccepted(original: ProposalAction, edited: ProposalAction):
   if (original.type === 'discovery.list_add' && edited.type === 'discovery.list_add') return { ...edited, ...locked, field: original.field } as ProposalAction
   if (original.type === 'discovery.signal' && edited.type === 'discovery.signal') return { ...edited, ...locked, signal: original.signal } as ProposalAction
   if (original.type === 'evidence.score' && edited.type === 'evidence.score') return { ...edited, ...locked, category: original.category } as ProposalAction
+  if (original.type === 'activity.note' && edited.type === 'activity.note') return { ...edited, ...locked, companyId: original.companyId, companyName: original.companyName } as ProposalAction
+  if (original.type === 'task.create' && edited.type === 'task.create') return { ...edited, ...locked, companyId: original.companyId, companyName: original.companyName } as ProposalAction
+  if (original.type === 'opportunity.stage' && edited.type === 'opportunity.stage') {
+    const { opportunityId, opportunityTitle, companyName, from, to } = original
+    return { ...edited, ...locked, opportunityId, opportunityTitle, companyName, from, to } as ProposalAction
+  }
   return { ...edited, ...locked } as ProposalAction
 }

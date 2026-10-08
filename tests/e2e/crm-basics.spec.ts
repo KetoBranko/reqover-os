@@ -65,13 +65,13 @@ test('Unternehmen, Kontakt, Aufgabe und Notiz anlegen und nach Reload wiederfind
   // Befehlsleiste: globale Suche führt zum Unternehmen.
   await page.goto('/aufgaben')
   await page.getByRole('button', { name: /Was möchtest du tun/ }).click()
-  await page.getByPlaceholder(/Unternehmen, Kontakt oder Aktion/).fill(company.slice(-12))
+  await page.getByPlaceholder(/Suchen, Aktion wählen/).fill(company.slice(-12))
   await page.getByRole('option', { name: new RegExp(company) }).click()
   await page.waitForURL(companyUrl)
 
   // Schnellaktion öffnet den Anlage-Dialog.
   await page.keyboard.press('ControlOrMeta+k')
-  await page.getByPlaceholder(/Unternehmen, Kontakt oder Aktion/).fill('Neue Aufgabe')
+  await page.getByPlaceholder(/Suchen, Aktion wählen/).fill('Neue Aufgabe')
   await expect(page.getByRole('option', { name: 'Neue Aufgabe anlegen' })).toHaveAttribute('data-selected', 'true')
   await page.keyboard.press('Enter')
   await expect(page).toHaveURL(/\/aufgaben\?neu=/)

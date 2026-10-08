@@ -27,12 +27,13 @@ interface Row {
  */
 export function ProposalReview({
   proposalId,
-  discoveryId,
+  returnTo,
   actions,
   current,
 }: {
   proposalId: string
-  discoveryId: string
+  /** Where to go after a decision. */
+  returnTo: string
   actions: ProposalAction[]
   current: Partial<Record<string, string | null>>
 }) {
@@ -51,7 +52,7 @@ export function ProposalReview({
     const r = await apply.run({ proposalId, accepted })
     if (r.ok) {
       const { accepted: n, total } = r.data
-      router.push(`/discovery/${discoveryId}`)
+      router.push(returnTo)
       const { toast } = await import('sonner')
       toast.success(n === total ? `Alle ${n} Änderungen übernommen.` : `${n} von ${total} Änderungen übernommen.`)
     }
@@ -59,7 +60,7 @@ export function ProposalReview({
 
   async function discard() {
     const r = await reject.run({ id: proposalId })
-    if (r.ok) router.push(`/discovery/${discoveryId}`)
+    if (r.ok) router.push(returnTo)
   }
 
   const busy = apply.pending || reject.pending
@@ -132,6 +133,12 @@ function ActionRow({ row, editing, current, onChange }: { row: Row; editing: boo
         </div>
         {editing && row.accepted ? <Editor action={a} set={set} /> : <p className="mt-1 whitespace-pre-line text-sm text-fg">{d.text}</p>}
         {row.invalid && <p className="mt-1 text-[12px] text-danger">{row.invalid}</p>}
+        {a.type === 'opportunity.stage' && a.to === 'won' && !a.orderConfirmedAt && !a.wonWithoutOrder && (
+          <p className="mt-1 flex items-center gap-1 text-[12px] text-warning">
+            <AlertTriangle className="size-3.5" aria-hidden />
+            Eine bestätigte Beauftragung ist nicht hinterlegt. Unter „Bearbeiten“ ein Auftragsdatum angeben oder trotzdem als gewonnen markieren.
+          </p>
+        )}
         {current && a.type === 'discovery.field' && <p className="mt-1 text-[12px] text-faint">Ersetzt: {current.length > 140 ? `${current.slice(0, 140)} …` : current}</p>}
         {a.quote && (
           <p className="mt-1.5 flex gap-1.5 text-[13px] italic text-muted">
@@ -156,6 +163,29 @@ function Editor({ action: a, set }: { action: ProposalAction; set: (patch: Parti
     case 'discovery.field':
     case 'discovery.list_add':
       return <Textarea className="mt-1.5" rows={a.type === 'discovery.field' ? 3 : 1} value={a.value} aria-label={label} onChange={(e) => set({ value: e.target.value }, e.target.value.trim() ? undefined : 'Darf nicht leer sein.')} />
+    case 'activity.note':
+      return <Textarea className="mt-1.5" rows={3} value={a.body} aria-label={label} onChange={(e) => set({ body: e.target.value }, e.target.value.trim() ? undefined : 'Darf nicht leer sein.')} />
+    case 'opportunity.stage':
+      if (a.to === 'lost') {
+        return <Input className="mt-1.5" value={a.lostReason ?? ''} placeholder="Grund" aria-label="Grund für Verloren" onChange={(e) => set({ lostReason: e.target.value || null }, e.target.value.trim() ? undefined : 'Für „Verloren“ wird ein Grund benötigt.')} />
+      }
+      if (a.to === 'won') {
+        return (
+          <div className="mt-1.5 grid gap-2 text-sm">
+            <label className="flex flex-wrap items-center gap-2">
+              Auftrag bestätigt am
+              <Input type="date" className="w-44" value={a.orderConfirmedAt ?? ''} aria-label="Datum der Auftragsbestätigung" onChange={(e) => set({ orderConfirmedAt: e.target.value || null, wonWithoutOrder: e.target.value ? false : a.wonWithoutOrder })} />
+            </label>
+            {!a.orderConfirmedAt && (
+              <label className="flex items-center gap-2">
+                <input type="checkbox" className="size-4 accent-[var(--color-accent)]" checked={a.wonWithoutOrder} onChange={(e) => set({ wonWithoutOrder: e.target.checked })} />
+                Trotzdem als gewonnen markieren
+              </label>
+            )}
+          </div>
+        )
+      }
+      return <p className="mt-1 text-sm text-fg">{describeAction(a).text}</p>
     case 'insight.create':
       return <Textarea className="mt-1.5" rows={2} value={a.statement} aria-label={label} onChange={(e) => set({ statement: e.target.value }, e.target.value.trim() ? undefined : 'Darf nicht leer sein.')} />
     case 'discovery.signal':
