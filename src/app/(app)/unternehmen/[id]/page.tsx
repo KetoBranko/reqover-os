@@ -16,8 +16,9 @@ import { NewTaskButton } from '@/features/tasks/task-form'
 import { TaskList } from '@/features/tasks/task-list'
 import { NewActivityButton } from '@/features/activities/activity-form'
 import { Timeline } from '@/features/activities/timeline'
+import { NewOpportunityButton } from '@/features/pipeline/opportunity-form'
 import { de } from '@/i18n/de'
-import { berlinDay, formatDate, formatNumber, relativeDay } from '@/lib/format'
+import { berlinDay, formatDate, formatMoney, formatNumber, relativeDay } from '@/lib/format'
 
 export const metadata: Metadata = { title: 'Unternehmen' }
 
@@ -125,7 +126,34 @@ async function CompanyView({ id }: { id: string }) {
         </TabsContent>
 
         <TabsContent value="opportunities" className="mt-5">
-          <EmptyState title="Chancen" description="Verkaufschancen dieses Unternehmens erscheinen hier." actions={<Badge>{de.common.comingSoon}</Badge>} />
+          <div className="mb-3 flex justify-end">
+            <NewOpportunityButton variant="secondary" initial={{ companyId: company.id }} contacts={contactOptions} />
+          </div>
+          {data.opportunities.length === 0 ? (
+            <EmptyState title="Noch keine Chancen" description="Sobald ein Pilot oder Auftrag in Sicht ist, lege hier eine Chance an." />
+          ) : (
+            <ul className="grid gap-2">
+              {data.opportunities.map(({ opportunity: o, stageName, outcome }) => (
+                <li key={o.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-surface p-4">
+                  <div className="min-w-0">
+                    <p className="font-medium">{o.title}</p>
+                    <p className="mt-0.5 text-[13px] text-muted">
+                      {o.valueCents != null ? formatMoney(o.valueCents) : 'Wert offen'}
+                      {o.nextStep && ` · Nächster Schritt: ${o.nextStep}`}
+                      {o.nextStepDate && ` (${relativeDay(o.nextStepDate, today)})`}
+                      {o.lostReason && ` · Grund: ${o.lostReason}`}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge tone={outcome === 'won' ? 'success' : outcome === 'lost' ? 'danger' : 'accent'}>{stageName}</Badge>
+                    <Link href="/pipeline" className="text-[13px] text-muted hover:text-accent">
+                      In Pipeline
+                    </Link>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </TabsContent>
 
         <TabsContent value="tasks" className="mt-5">

@@ -98,6 +98,23 @@ await sql.begin(async (tx) => {
       values (${org}, ${a.type}, ${a.title}, ${a.body}, ${at(a.when)}, ${ids[a.company]!}, ${a.contact ? cids[a.contact]! : null}, 'human', true, ${userId})`
   }
 
+  const stages = Object.fromEntries(
+    (await tx`select s.key, s.id, s.pipeline_id from public.pipeline_stages s join public.pipelines p on p.id = s.pipeline_id
+      where p.organization_id = ${org} and p.key = 'sales'`).map((r) => [r.key, r]),
+  )
+  const opportunities = [
+    { company: 'nordwerk', contact: 'meyer', title: 'Pilot: Angebots-Recovery', stage: 'discovery_scheduled', value: 280000, next: 'Discovery-Termin bestätigen', nextDue: -2, order: null, lost: null },
+    { company: 'helios', contact: 'arslan', title: 'Pilot: Eingeschlafene Projekte', stage: 'pilot_opportunity', value: 300000, next: 'Pilotumfang abstimmen', nextDue: 0, order: null, lost: null },
+    { company: 'brandt', contact: 'brandt', title: 'Erstgespräch Recovery', stage: 'to_contact', value: null, next: 'Erstanruf', nextDue: 1, order: null, lost: null },
+    { company: 'seeberg', contact: null, title: 'Pilot Leads-Recovery', stage: 'lost', value: 250000, next: null, nextDue: null, order: null, lost: 'Kein akutes Problem' },
+  ] as const
+  for (const o of opportunities) {
+    const st = stages[o.stage]!
+    await tx`insert into public.opportunities (organization_id, company_id, pipeline_id, stage_id, primary_contact_id, title, value_cents, next_step, next_step_date, order_confirmed_at, lost_reason, is_demo, created_by)
+      values (${org}, ${ids[o.company]!}, ${st.pipeline_id}, ${st.id}, ${o.contact ? cids[o.contact]! : null}, ${o.title}, ${o.value}, ${o.next},
+              ${o.nextDue == null ? null : day(o.nextDue)}, ${o.order}, ${o.lost}, true, ${userId})`
+  }
+
   const insights = [
     { company: 'nordwerk', kind: 'fact', statement: 'Angebote werden nach dem Versand nicht systematisch nachgefasst.', status: null, source: 'discovery' },
     { company: 'nordwerk', kind: 'hypothesis', statement: 'Mehr als 100 Angebote sind älter als 60 Tage und ungeklärt.', status: 'open', source: 'manual' },
@@ -108,6 +125,6 @@ await sql.begin(async (tx) => {
     await tx`insert into public.insights (organization_id, company_id, kind, statement, hypothesis_status, source, is_demo, created_by)
       values (${org}, ${ids[i.company]!}, ${i.kind}, ${i.statement}, ${i.status}, ${i.source}, true, ${userId})`
   }
-  console.log(`Demo-Daten angelegt: ${companies.length} Unternehmen, ${contacts.length} Kontakte, ${tasks.length} Aufgaben, ${activities.length} Aktivitäten, ${insights.length} Erkenntnisse.`)
+  console.log(`Demo-Daten angelegt: ${companies.length} Unternehmen, ${contacts.length} Kontakte, ${tasks.length} Aufgaben, ${activities.length} Aktivitäten, ${opportunities.length} Chancen, ${insights.length} Erkenntnisse.`)
 })
 await sql.end()

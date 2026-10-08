@@ -110,3 +110,42 @@ export const insightInput = z.object({
 export type InsightInput = z.infer<typeof insightInput>
 
 export const idInput = z.object({ id: uuid })
+
+export const PIPELINE_STAGE_KEYS = [
+  'to_contact',
+  'contacted',
+  'discovery_scheduled',
+  'discovery_done',
+  'need_confirmed',
+  'pilot_opportunity',
+  'proposal',
+  'won',
+  'lost',
+] as const
+export type PipelineStageKey = (typeof PIPELINE_STAGE_KEYS)[number]
+
+const optionalCents = z
+  .union([z.number().int().min(0).max(100_000_000_00), z.null()])
+  .optional()
+  .transform((v) => v ?? null)
+
+export const opportunityInput = z.object({
+  companyId: uuid,
+  title: trimmed(200).min(1, 'Bitte einen Titel angeben.'),
+  stageKey: z.enum(PIPELINE_STAGE_KEYS).default('to_contact'),
+  primaryContactId: optionalUuid,
+  valueCents: optionalCents,
+  nextStep: optionalText(500),
+  nextStepDate: optionalDay,
+})
+export type OpportunityInput = z.infer<typeof opportunityInput>
+
+export const opportunityUpdate = opportunityInput.omit({ companyId: true, stageKey: true }).partial()
+
+export const opportunityMove = z.object({
+  id: uuid,
+  stageKey: z.enum(PIPELINE_STAGE_KEYS),
+  orderConfirmedAt: optionalDay,
+  lostReason: optionalText(1000),
+})
+export type OpportunityMove = z.infer<typeof opportunityMove>
