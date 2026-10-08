@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Building2 } from 'lucide-react'
 import { requireSession } from '@/server/auth/session'
 import { getOverview } from '@/server/services/overview'
+import { requestNow } from '@/server/clock'
 import { briefingLines, greeting } from '@/domain/briefing'
 import { berlinHour, formatDateTime, formatLongDate } from '@/lib/format'
 import { Skeleton, EmptyState } from '@/components/ui/states'
@@ -34,7 +35,7 @@ function OverviewSkeleton() {
 
 async function Overview() {
   const session = await requireSession()
-  const now = new Date()
+  const now = await requestNow()
   const data = await getOverview(session.ctx, now)
   const lines = briefingLines({ items: data.items, counts: data.counts, validation: data.validation, changes: data.changes, formatSince: formatDateTime })
   const isEmpty = data.kpis.targetCompanies === 0 && data.kpis.pipelineCount === 0 && data.kpis.discoveriesCompleted === 0

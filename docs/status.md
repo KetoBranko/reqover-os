@@ -161,3 +161,17 @@ Offene Punkte: Einladen weiterer Personen und Aufbewahrungsfristen (Data Retenti
 - Tests: 22 Unit, 81 DB, 22 E2E (neu: Header und geschützte Endpunkte ohne Sitzung)
 
 Offene Punkte: Die CSP erlaubt Inline-Skripte, weil Next.js beim Streaming darauf angewiesen ist; Nonces würden das Vorrendern abschalten. Die Anfragebegrenzung gilt je Server-Instanz.
+
+## Phase 13 – Haupt-Flow als End-to-End-Test · abgeschlossen 08.10.2026
+
+- `tests/e2e/main-flow.spec.ts` prüft alle 18 Schritte aus Abschnitt 41 am Stück, auf Desktop und Mobil:
+  1. Briefing öffnen; die heute fällige Aufgabe macht das Unternehmen zur Priorität
+  2. Unternehmen mit Fakt, Hypothese und Verlauf öffnen, Gespräch vorbereiten, Discovery starten
+  3. Gespräch führen und Kernantwort speichern, danach Notiz schreiben und diktieren
+  4. „Gespräch analysieren“ zeigt den Prüfbildschirm mit Evidence-Vorschlag samt Begründung, Fakt, Aufgabe und Chance; „Alles übernehmen“
+  5. Danach gespeichert: Discovery (Hauptschmerz, Evidence 2/20), Fakt am Unternehmen, Verlaufseintrag „AI-Vorschlag übernommen“, Aufgabe für morgen, Chance „Pilot: Angebots-Recovery“, Pipeline-Kennzahl +1
+  6. Am nächsten Tag steht die Anruf-Aufgabe im Briefing, vorher nicht
+- Für Schritt 18 gibt es eine Testuhr (`src/server/clock.ts`): Ein Cookie verschiebt „heute“ für die Übersicht. Sie wirkt nur mit `APP_ENV=test`; in Produktion wird der Cookie ignoriert
+- Tests: 22 Unit, 81 DB, 24 E2E
+
+Offene Punkte (bekannt, klein): Datumsfelder zeigen im Headless-Browser das US-Format, im echten deutschen Browser das deutsche; die Statuszeile des Diktats in der mobilen Befehlsleiste ist eng.
