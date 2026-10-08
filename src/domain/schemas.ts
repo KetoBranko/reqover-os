@@ -151,3 +151,59 @@ export const opportunityMove = z.object({
   lostReason: optionalText(1000),
 })
 export type OpportunityMove = z.infer<typeof opportunityMove>
+
+// ---------------------------------------------------------------------------
+// Discovery
+// ---------------------------------------------------------------------------
+const textList = z.array(trimmed(300).min(1)).max(30).default([])
+
+export const discoveryStart = z.object({
+  companyId: uuid,
+  contactId: optionalUuid,
+  opportunityId: optionalUuid,
+  /** live = conversation mode with timer; document = record a past conversation. */
+  mode: z.enum(['live', 'document']),
+  conductedOn: optionalDay,
+})
+export type DiscoveryStart = z.infer<typeof discoveryStart>
+
+export const discoveryNotes = z
+  .object({
+    rawNotes: optionalText(100_000),
+    coreQuestionAnswer: optionalText(10_000),
+    summary: optionalText(10_000),
+    mainPain: optionalText(2000),
+    recoveryUseCase: optionalText(2000),
+    objections: textList,
+    externalizationConcerns: textList,
+    desiredKpis: textList,
+    contactId: optionalUuid,
+    conductedOn: isoDay,
+  })
+  .partial()
+export type DiscoveryNotes = z.infer<typeof discoveryNotes>
+
+export const discoveryAnswerInput = z.object({
+  discoveryId: uuid,
+  questionKey: z.string().regex(/^[a-z0-9_]{2,60}$/),
+  value: z.json().nullable(),
+  verbatim: optionalText(10_000),
+  isUncertain: z.boolean().default(false),
+})
+export type DiscoveryAnswerInput = z.infer<typeof discoveryAnswerInput>
+
+export const evidenceInput = z.object({
+  discoveryId: uuid,
+  category: z.enum(['problem', 'frequency', 'economic_relevance', 'current_effort', 'backlog', 'capacity', 'externalization', 'data_access', 'budget', 'next_step']),
+  points: z.number().int().min(0).max(2).nullable(),
+  evidence: optionalText(2000),
+  rationale: optionalText(2000),
+})
+export type EvidenceInput = z.infer<typeof evidenceInput>
+
+export const signalInput = z.object({
+  discoveryId: uuid,
+  signal: z.enum(['signal_problem_confirmed', 'signal_regular_backlog', 'signal_capacity_cause', 'signal_external_ok', 'signal_price_ok', 'signal_pilot_interest']),
+  value: z.enum(['yes', 'no', 'unclear']),
+})
+export type SignalInput = z.infer<typeof signalInput>

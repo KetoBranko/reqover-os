@@ -32,3 +32,17 @@ Offene Punkte: Spalte „Pipeline“ in der Unternehmensliste bleibt leer, bis P
 - Jeder Phasenwechsel schreibt einen Verlaufseintrag und Events (`OPPORTUNITY_STAGE_CHANGED`, `PILOT_PROPOSED`, `PILOT_WON`, `PILOT_LOST`)
 - Chancen-Tab in der Unternehmens-360°-Sicht; Schnellaktion „Neue Chance anlegen“ in der Befehlsleiste; Demo-Seed um 4 Chancen erweitert
 - Tests: 50 DB (neu: 7 Pipeline-Tests inkl. direkter Datenbank-Umgehungsversuche), E2E Desktop + Mobil: anlegen → ziehen → Menü → Gewonnen-Dialog → Verloren mit Grund → Reload → Verlauf
+
+## Phase 5 – Discovery · abgeschlossen 08.10.2026
+
+- Discovery-Liste und Arbeitsbereich je Gespräch mit Tabs „Gespräch“, „Fragen“ (Katalog A–H, 39 Fragen, typgerechte Eingaben, „Unsichere Angabe“), „Evidence Score“ und „Evidenz vs. Interpretation“
+- Zwei Wege: „Discovery starten“ (Gesprächsmodus im Fokus-Layout ohne Navigation: Timer, Kernfrage, Notizen, Kernfragen-Leiste, „Gespräch beenden“) und „Gespräch nachträglich dokumentieren“. Es gibt keine Aufnahme; Diktieren ist als „Demnächst“ markiert (Phase 8)
+- Alle Eingaben speichern automatisch mit sichtbarem Zustand („Speichert …“, „Gespeichert“, Fehler)
+- Evidence Score: 10 Kategorien × 0–2 Punkte mit Bewertungshilfe je Stufe, Kundenaussage und Begründung. Eine menschliche Bewertung zählt als Bestätigung (`confirmed_by/at`); die Anzeige von AI-Vorschlägen ist vorbereitet (Phase 7)
+- Validierungssignale (Problem, Budget, Entscheider usw.) als Ja/Teilweise/Nein/Unklar
+- Evidenz vs. Interpretation: Kundenaussagen, Interpretationen, bestätigte/widerlegte Hypothesen, Überraschungen, strikt getrennt
+- „Abschließen“ friert das Pilotangebot ein, schreibt einen Verlaufseintrag mit Score und Events (`DISCOVERY_COMPLETED`, `PAIN_CONFIRMED`, `EVIDENCE_SCORE_CONFIRMED`); „Bearbeiten“ öffnet wieder
+- Pipeline-Karten zeigen jetzt den Evidence Score (neuestes Gespräch des Unternehmens) und die letzte Aktivität; Discovery-Tab in der Unternehmens-360°-Sicht
+- Tests: 9 Unit, 57 DB (neu: Antwortvalidierung je Fragetyp, Bestätigung, Abschluss/Events, Mandantentrennung), E2E Desktop + Mobil: starten → Kernfrage → beenden → Fragen → Score → Abschluss → Reload → Verlauf
+
+Offene Punkte: Das Datumsfeld ist das native Browser-Steuerelement und folgt der Spracheinstellung des Browsers (im deutschen Browser 08.10.2026). „Gespräch analysieren“ folgt mit der AI-Schicht (Phase 7).

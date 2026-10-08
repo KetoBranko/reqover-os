@@ -103,7 +103,7 @@ await sql.begin(async (tx) => {
       where p.organization_id = ${org} and p.key = 'sales'`).map((r) => [r.key, r]),
   )
   const opportunities = [
-    { company: 'nordwerk', contact: 'meyer', title: 'Pilot: Angebots-Recovery', stage: 'discovery_scheduled', value: 280000, next: 'Discovery-Termin bestätigen', nextDue: -2, order: null, lost: null },
+    { company: 'nordwerk', contact: 'meyer', title: 'Pilot: Angebots-Recovery', stage: 'discovery_done', value: 280000, next: 'Bedarf mit Geschäftsführung bestätigen', nextDue: -2, order: null, lost: null },
     { company: 'helios', contact: 'arslan', title: 'Pilot: Eingeschlafene Projekte', stage: 'pilot_opportunity', value: 300000, next: 'Pilotumfang abstimmen', nextDue: 0, order: null, lost: null },
     { company: 'brandt', contact: 'brandt', title: 'Erstgespräch Recovery', stage: 'to_contact', value: null, next: 'Erstanruf', nextDue: 1, order: null, lost: null },
     { company: 'seeberg', contact: null, title: 'Pilot Leads-Recovery', stage: 'lost', value: 250000, next: null, nextDue: null, order: null, lost: 'Kein akutes Problem' },
@@ -115,6 +115,46 @@ await sql.begin(async (tx) => {
               ${o.nextDue == null ? null : day(o.nextDue)}, ${o.order}, ${o.lost}, true, ${userId})`
   }
 
+  // Discovery interviews: one completed (Nordwerk), one draft (Helios).
+  const [disc] = await tx`insert into public.discovery_interviews
+    (organization_id, company_id, contact_id, interviewer_id, status, conducted_at, duration_seconds, raw_notes, core_question_answer, summary, main_pain, recovery_use_case,
+     objections, externalization_concerns, desired_kpis, signal_problem_confirmed, signal_regular_backlog, signal_capacity_cause, signal_external_ok, signal_price_ok, signal_pilot_interest,
+     pilot_offer_snapshot, completed_at, is_demo, created_by)
+    values (${org}, ${ids.nordwerk!}, ${cids.meyer!}, ${userId}, 'completed', ${at(-6)}, 2460,
+      'Rund 30–40 Angebote pro Monat. Nachfassen macht jeder Außendienstler selbst. Keine feste Wiedervorlage.',
+      'Die alten Angebote aus dem letzten Jahr, bestimmt 100 Stück.',
+      'Backlog an ungeklärten Angeboten bestätigt, Kapazität im Innendienst ist der Engpass.',
+      'Angebote werden nach Versand nicht nachgefasst', 'Offene Angebote älter als 60 Tage',
+      ${['Datenschutz', 'Kundenbeziehung']}, ${['Kunden sollen nicht merken, dass jemand Externes anruft']}, ${['Reaktivierte Angebote', 'Rücklaufquote']},
+      'yes', 'yes', 'yes', 'unclear', 'unclear', 'no',
+      ${sql.json({ maxCases: 100, durationWeeks: 6, priceMinCents: 250000, priceMaxCents: 300000 })}, ${at(-6, 11)}, true, ${userId})
+    returning id`
+  const scores: [string, number, string | null, string | null][] = [
+    ['problem', 2, '„Da liegen bestimmt 100 alte Angebote.“', null],
+    ['frequency', 2, '„Das passiert jeden Monat.“', null],
+    ['economic_relevance', 1, null, 'Kein konkreter wirtschaftlicher Wert genannt.'],
+    ['current_effort', 1, null, 'Aufwand nur grob beschrieben.'],
+    ['backlog', 2, '„Bestimmt 100 Stück.“', null],
+    ['capacity', 2, '„Der Innendienst kommt nicht hinterher.“', null],
+    ['externalization', 1, null, 'Grundsätzlich offen, Sorge um Kundenbeziehung.'],
+    ['data_access', 1, null, 'CRM-Export denkbar, Freigabe offen.'],
+    ['budget', 0, null, 'Preis noch nicht besprochen.'],
+    ['next_step', 2, '„Lassen Sie uns nächste Woche mit dem Vertriebsleiter sprechen.“', null],
+  ]
+  for (const [category, points, evidence, rationale] of scores) {
+    await tx`insert into public.evidence_scores (organization_id, discovery_id, category, points, evidence, rationale, confirmed_by, confirmed_at)
+      values (${org}, ${disc!.id}, ${category}, ${points}, ${evidence}, ${rationale}, ${userId}, ${at(-6, 12)})`
+  }
+  await tx`insert into public.discovery_answers (organization_id, discovery_id, question_key, value, verbatim) values
+    (${org}, ${disc!.id}, 'quotes_per_month', ${sql.json({ min: 30, max: 40 })}, '30 bis 40'),
+    (${org}, ${disc!.id}, 'old_open_quotes', ${sql.json(true)}, null),
+    (${org}, ${disc!.id}, 'crm_erp', ${sql.json('Eigenes ERP, kein CRM')}, null)`
+  await tx`insert into public.insights (organization_id, company_id, discovery_id, kind, statement, source, is_demo, created_by) values
+    (${org}, ${ids.nordwerk!}, ${disc!.id}, 'customer_quote', '„Der Innendienst kommt einfach nicht hinterher.“', 'discovery', true, ${userId}),
+    (${org}, ${ids.nordwerk!}, ${disc!.id}, 'interpretation', 'Engpass ist Kapazität, nicht fehlende Bereitschaft.', 'discovery', true, ${userId})`
+  await tx`insert into public.discovery_interviews (organization_id, company_id, contact_id, interviewer_id, status, conducted_at, raw_notes, signal_problem_confirmed, is_demo, created_by)
+    values (${org}, ${ids.helios!}, ${cids.arslan!}, ${userId}, 'draft', ${at(-3)}, 'Projekte schlafen nach der Planungsphase ein.', 'yes', true, ${userId})`
+
   const insights = [
     { company: 'nordwerk', kind: 'fact', statement: 'Angebote werden nach dem Versand nicht systematisch nachgefasst.', status: null, source: 'discovery' },
     { company: 'nordwerk', kind: 'hypothesis', statement: 'Mehr als 100 Angebote sind älter als 60 Tage und ungeklärt.', status: 'open', source: 'manual' },
@@ -125,6 +165,6 @@ await sql.begin(async (tx) => {
     await tx`insert into public.insights (organization_id, company_id, kind, statement, hypothesis_status, source, is_demo, created_by)
       values (${org}, ${ids[i.company]!}, ${i.kind}, ${i.statement}, ${i.status}, ${i.source}, true, ${userId})`
   }
-  console.log(`Demo-Daten angelegt: ${companies.length} Unternehmen, ${contacts.length} Kontakte, ${tasks.length} Aufgaben, ${activities.length} Aktivitäten, ${opportunities.length} Chancen, ${insights.length} Erkenntnisse.`)
+  console.log(`Demo-Daten angelegt: ${companies.length} Unternehmen, ${contacts.length} Kontakte, ${tasks.length} Aufgaben, ${activities.length} Aktivitäten, ${opportunities.length} Chancen, 2 Discovery-Gespräche, ${insights.length} Erkenntnisse.`)
 })
 await sql.end()

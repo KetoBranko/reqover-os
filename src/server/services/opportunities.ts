@@ -8,6 +8,7 @@ import { de } from '@/i18n/de'
 import { formatMoney } from '@/lib/format'
 import { recordActivity } from './activities'
 import { escapeLike } from './companies'
+import { latestEvidenceByCompany } from './discovery'
 
 const PIPELINE_KEY = 'sales'
 
@@ -34,6 +35,8 @@ export interface BoardCard {
   orderConfirmedAt: string | null
   wonWithoutOrder: boolean
   isDemo: boolean
+  evidence: { points: number; rated: number } | null
+  lastActivityAt: Date | null
 }
 
 async function stagesOf(tx: Tx, ctx: RequestContext) {
@@ -72,6 +75,7 @@ export async function getBoard(ctx: RequestContext, opts: { q?: string } = {}) {
         orderConfirmedAt: opportunities.orderConfirmedAt,
         wonWithoutOrder: opportunities.wonWithoutOrder,
         isDemo: opportunities.isDemo,
+        lastActivityAt: sql<Date | null>`(select max(a.occurred_at) from activities a where a.company_id = ${opportunities.companyId})`.mapWith((v) => (v ? new Date(v) : null)),
       })
       .from(opportunities)
       .innerJoin(companies, eq(companies.id, opportunities.companyId))
@@ -83,9 +87,10 @@ export async function getBoard(ctx: RequestContext, opts: { q?: string } = {}) {
         ),
       )
       .orderBy(desc(opportunities.stageChangedAt))
+    const evidence = await latestEvidenceByCompany(tx, ctx, [...new Set(rows.map((r) => r.companyId))])
     return {
       stages: stages.map(({ pipelineId: _p, ...s }) => s as BoardStage),
-      cards: rows as BoardCard[],
+      cards: rows.map((r) => ({ ...r, evidence: evidence.get(r.companyId) ?? null })) as BoardCard[],
     }
   })
 }
