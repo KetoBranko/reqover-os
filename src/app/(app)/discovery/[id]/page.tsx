@@ -90,7 +90,7 @@ async function Workspace({ id }: { id: string }) {
           </Card>
           <div className="grid content-start gap-4">
             <Card className="p-4">
-              <NoteField discoveryId={id} field="rawNotes" label="Gesprächsnotizen" initial={i.rawNotes} rows={10} disabled={locked} />
+              <NoteField discoveryId={id} field="rawNotes" label="Gesprächsnotizen" initial={i.rawNotes} rows={10} disabled={locked} dictation />
             </Card>
             <Card className="grid gap-4 p-4">
               <ListField discoveryId={id} field="objections" label="Einwände" initial={i.objections} placeholder="Einwand eingeben, Enter" disabled={locked} />

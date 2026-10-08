@@ -79,7 +79,7 @@ Offene Punkte: Die Gewichte sind ein erster Vorschlag und liegen zentral in `REA
   - Events `AI_PROPOSAL_CREATED/APPLIED/REJECTED`
   - Der Server lässt keine Änderung an Typ, Frage, Zitat oder Ziel-Chance zu
 - Nächster Schritt: Gibt es eine offene Chance, wird ihr nächster Schritt aktualisiert. Sonst wird eine Chance vorgeschlagen (nur bei belegtem Interesse) oder eine Aufgabe angelegt. Die Wiedervorlage erscheint am Fälligkeitstag im Briefing
-- Testmodus: deterministischer Test-Provider, nur mit `APP_ENV=test` startbar (`npm run dev:e2e`) und in der Oberfläche als „Testmodus, kein echtes Modell“ gekennzeichnet
+- Testmodus: deterministischer Test-Provider, nur mit `APP_ENV=test` startbar (`npm run dev:e2e`, setzt auch `STT_PROVIDER=fake`) und in der Oberfläche als „Testmodus, kein echtes Modell“ gekennzeichnet
 - Tests: 22 Unit, 70 DB (neu: Analyse ändert nichts, Auswahl/Bearbeitung, Audit, Manipulationsversuche, Mandantentrennung), 10 E2E (neu: analysieren → bearbeiten → übernehmen → Reload → Aufgabe und Verlauf)
 
 Offene Punkte: Für echten Betrieb fehlt `ANTHROPIC_API_KEY` (von Branko anzulegen). Assistent und freie Befehle folgen in der nächsten Phase.
@@ -97,3 +97,22 @@ Offene Punkte: Für echten Betrieb fehlt `ANTHROPIC_API_KEY` (von Branko anzuleg
 - Tests: 22 Unit, 75 DB (neu: Mandantentrennung der Werkzeuge und Gespräche, Vorschlag statt Schreiben, Bestätigung legt Aufgabe an, „Gewonnen“-Regel), 12 E2E (neu: Frage beantworten → Aufgabe über die Befehlsleiste vorschlagen → vorher nicht vorhanden → Übernehmen → Aufgabe vorhanden)
 
 Offene Punkte: Antworten im echten Betrieb hängen am `ANTHROPIC_API_KEY`; im Testmodus antwortet ein regelbasierter Platzhalter. Spracheingabe im Assistenten folgt mit Phase 9.
+
+## Phase 9 – Spracheingabe und Gesprächsnachbereitung · abgeschlossen 08.10.2026
+
+- Austauschbarer Sprachdienst über `STT_PROVIDER`:
+  - `browser` (Standard): Spracherkennung des Browsers (Chrome, Edge, Safari), Sprache de-DE. Hinweis: Chrome und Edge schicken das Audio dafür an den Dienst des Browser-Herstellers
+  - `openai`: Aufnahme im Browser, Umwandlung über `/api/sprache` mit `OPENAI_API_KEY` und `STT_MODEL`. Ohne Schlüssel ist die Spracheingabe aus und es erscheint kein Mikrofon-Knopf
+  - `none`: aus
+  - `fake`: nur mit `APP_ENV=test`, für automatische Tests
+- `/api/sprache` nimmt nur angemeldete Anfragen von derselben Herkunft an, nur Audio bis 15 MB, höchstens 20 Diktate pro Minute und Nutzer. Das Audio wird nicht gespeichert, nur der Text, den du übernimmst
+- Aufnahme nur nach Klick, sichtbar mit rotem Punkt „Mikrofon an“ und Stopp-Knopf; endet beim zweiten Klick, beim Verlassen der Seite oder nach drei Minuten. Keine Aufnahme im Hintergrund, das Gespräch selbst wird nicht aufgezeichnet
+- Diktieren an diesen Stellen:
+  - Gesprächsmodus und Discovery-Arbeitsbereich: „Notiz diktieren“ hängt den Text an die Notizen an und speichert sofort
+  - Notiz oder Aktivität erfassen, auch die Schnellnotiz nach „Erledigt“
+  - Assistent: Frage diktieren, vor dem Senden prüfbar
+  - Global: Mikrofon neben „Was möchtest du tun?“ öffnet die Befehlsleiste und hört sofort zu. Der Text erscheint als Suche oder „ReQover fragen: …“
+- Fehlerfälle mit klarer Meldung: Browser ohne Spracherkennung, Mikrofon verweigert oder nicht vorhanden, Dienst nicht erreichbar
+- Tests: 22 Unit, 75 DB, 16 E2E (neu: Diktat mit simuliertem Mikrofon im Gesprächsmodus inkl. Reload, Sprachbefehl über die Befehlsleiste, Absicherung des Endpunkts)
+
+Offene Punkte: Die Browser-Spracherkennung ist nur manuell in echten Browsern prüfbar (headless gibt es sie nicht). Für eine Transkription ohne Browser-Hersteller braucht es `STT_PROVIDER=openai` mit Schlüssel.

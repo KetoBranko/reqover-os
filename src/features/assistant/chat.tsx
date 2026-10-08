@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/input'
 import { useAction } from '@/components/forms/use-action'
 import { applyProposalAction, rejectProposalAction } from '@/features/ai/actions'
 import { describeAction } from '@/features/ai/describe'
+import { DictateButton } from '@/features/voice/dictate'
 import { askAction, newConversationAction } from './actions'
 import { cn } from '@/lib/cn'
 
@@ -123,6 +124,7 @@ export function AssistantChat({ conversationId, items, initialQuestion }: { conv
           aria-label="Frage an den Assistenten"
           className="max-h-40 min-h-10 flex-1 resize-none border-0 bg-transparent focus-visible:ring-0"
         />
+        <DictateButton compact label="Frage diktieren" onText={(t) => setText((x) => (x.trim() ? `${x.trim()} ${t}` : t))} className="shrink-0" />
         <Button type="submit" variant="primary" size="icon" aria-label="Senden" disabled={!text.trim() || ask.pending}>
           <ArrowUp />
         </Button>

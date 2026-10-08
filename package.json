@@ -17,7 +17,7 @@
     "local:stop": "scripts/local-services.sh stop",
     "local:reset": "scripts/local-services.sh reset && npm run db:migrate",
     "user:create": "tsx --env-file=.env.local scripts/create-user.mts",
-    "dev:e2e": "APP_ENV=test AI_PROVIDER=fake next dev -p 3000"
+    "dev:e2e": "APP_ENV=test AI_PROVIDER=fake STT_PROVIDER=fake next dev -p 3000"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.132.1",

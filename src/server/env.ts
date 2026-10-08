@@ -12,7 +12,7 @@ const schema = z.object({
   ANTHROPIC_API_KEY: z.string().optional(),
   AI_MODEL_EXTRACTION: z.string().default('claude-sonnet-5-5'),
   AI_MODEL_ASSISTANT: z.string().default('claude-sonnet-5-5'),
-  STT_PROVIDER: z.enum(['openai', 'browser', 'fake']).default('browser'),
+  STT_PROVIDER: z.enum(['browser', 'openai', 'none', 'fake']).default('browser'),
   OPENAI_API_KEY: z.string().optional(),
   STT_MODEL: z.string().default('gpt-4o-transcribe'),
 })

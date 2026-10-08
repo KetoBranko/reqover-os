@@ -4,11 +4,13 @@ import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Command } from 'cmdk'
 import * as D from '@radix-ui/react-dialog'
-import { Building2, CheckSquare, Columns3, MessagesSquare, CornerDownLeft, Search, Sparkles, User, UserPlus, Plus, type LucideIcon } from 'lucide-react'
+import { Building2, CheckSquare, Columns3, MessagesSquare, CornerDownLeft, Mic, Search, Sparkles, User, UserPlus, Plus, type LucideIcon } from 'lucide-react'
 import { PRIMARY_NAV, SECONDARY_NAV } from '@/components/shell/nav'
 import { formatDay } from '@/lib/format'
 import { de } from '@/i18n/de'
 import { searchAction } from './actions'
+import { DictateButton } from '@/features/voice/dictate'
+import { useVoiceMode } from '@/features/voice/voice-config'
 import type { SearchHit } from '@/server/services/search'
 
 const OPEN_EVENT = 'reqover:command-open'
@@ -42,7 +44,9 @@ const HIT_GROUP: Record<SearchHit['kind'], string> = { company: de.nav.companies
 export function CommandBar() {
   const router = useRouter()
   const [open, setOpen] = useState(false)
+  const [voice, setVoice] = useState(false)
   const [query, setQuery] = useState('')
+  const voiceMode = useVoiceMode()
   const [hits, setHits] = useState<SearchHit[]>([])
   const [searching, startSearch] = useTransition()
   const latest = useRef('')
@@ -54,7 +58,10 @@ export function CommandBar() {
         setOpen((o) => !o)
       }
     }
-    const onOpen = () => setOpen(true)
+    const onOpen = (e: Event) => {
+      setVoice(Boolean((e as CustomEvent<{ voice?: boolean }>).detail?.voice))
+      setOpen(true)
+    }
     window.addEventListener('keydown', onKey)
     window.addEventListener(OPEN_EVENT, onOpen)
     return () => {
@@ -99,8 +106,28 @@ export function CommandBar() {
         <span className="flex-1 truncate">{de.nav.commandBar}</span>
         <kbd className="hidden rounded border border-line px-1.5 text-[11px] text-faint sm:inline">⌘K</kbd>
       </button>
+      {(voiceMode.mode === 'browser' || voiceMode.mode === 'server') && (
+        <button
+          type="button"
+          onClick={() => window.dispatchEvent(new CustomEvent(OPEN_EVENT, { detail: { voice: true } }))}
+          aria-label="Spracheingabe"
+          title="Spracheingabe"
+          className="grid size-9 shrink-0 place-items-center rounded-lg border border-line bg-surface text-accent hover:border-line-strong"
+        >
+          <Mic className="size-4" aria-hidden />
+        </button>
+      )}
 
-      <D.Root open={open} onOpenChange={(o) => { setOpen(o); if (!o) setQuery('') }}>
+      <D.Root
+        open={open}
+        onOpenChange={(o) => {
+          setOpen(o)
+          if (!o) {
+            setQuery('')
+            setVoice(false)
+          }
+        }}
+      >
         <D.Portal>
           <D.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-[2px]" />
           <D.Content className="fixed inset-x-0 top-0 z-50 mx-auto w-full max-w-xl px-3 pt-[max(env(safe-area-inset-top),12px)] sm:top-[12vh] sm:pt-0">
@@ -116,6 +143,7 @@ export function CommandBar() {
                   className="h-12 flex-1 bg-transparent text-[15px] text-fg outline-none placeholder:text-faint"
                 />
                 {searching && <span className="text-[12px] text-faint">{de.common.loading}</span>}
+                <DictateButton compact autoStart={voice} label="Befehl diktieren" onText={onQueryChange} className="max-w-[45%] flex-row-reverse" />
               </div>
               <Command.List className="max-h-[60vh] overflow-y-auto p-2">
                 {/* From three characters the assistant entry is always offered, so there is no empty state. */}
