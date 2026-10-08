@@ -126,3 +126,21 @@ Offene Punkte: Die Browser-Spracherkennung ist nur manuell in echten Browsern pr
 - Tests: 22 Unit, 75 DB, 18 E2E (neu: zehn Kernseiten ohne seitliches Überlaufen auf Desktop und Mobil, Manifest und Icons erreichbar)
 
 Offene Punkte: Datumsfelder zeigen das Format des Geräts (auf deutschen Geräten TT.MM.JJJJ). Einstellungen sind noch „Demnächst“ und folgen in Phase 11.
+
+## Phase 11 – Einstellungen, Änderungsprotokoll, Export und Löschen · abgeschlossen 08.10.2026
+
+- `/einstellungen`:
+  - Profil (Anzeigename, Vorname für die Begrüßung)
+  - Organisation (Name)
+  - AI-Stufe 0 bis 2. Stufe 1 bedeutet, dass der Assistent nur liest und die Vorschlags-Werkzeuge gar nicht bekommt (auch serverseitig gesperrt). Stufen 3 und 4 sind vorbereitet, in V1 aber nicht freigeschaltet
+  - Status von AI-Anbieter und Spracheingabe
+  - Pilotangebot
+  - Team (Einladungen „Demnächst“)
+  - Ändern dürfen Inhaber und Admins. Der Server prüft die Rolle, und RLS verhindert die Änderung zusätzlich (0 geänderte Zeilen werden als „nicht erlaubt“ gemeldet)
+- `/einstellungen/protokoll`: Änderungsprotokoll mit Zeitpunkt, Bereich, Aktion, Name des Datensatzes und Feldänderungen alt → neu. Phasen, Personen und Statuswerte erscheinen als Namen. Dazu „vorgeschlagen durch ReQover AI, bestätigt durch …“, Filter nach Mensch/AI und Bereich sowie Blättern
+- Export: `/api/export` liefert alle Daten der Organisation als JSON (Inhaber/Admins), inklusive Änderungsprotokoll und Ereignissen. Von Assistent-Gesprächen enthält er nur die eigenen, weil diese privat sind
+- „Demo-Daten entfernen“ löscht nur als Demo markierte Einträge
+- „Organisation löschen“ (nur Inhaber) verlangt den eingetippten Namen. Die Datenbankfunktion `private.delete_organization` prüft Rolle und Namen selbst und löscht alles per Kaskade, auch Protokoll und Ereignisse. Migration 0005 sorgt dafür, dass das Audit beim Löschen der ganzen Organisation nicht scheitert
+- Tests: 22 Unit, 81 DB (neu: Rollen und RLS bei Einstellungen, AI-Stufe 1, Protokoll, Export-Trennung, Demo-Entfernung, Organisationslöschung inkl. Gegenprobe), 20 E2E (neu: Pilotangebot ändern, Export herunterladen, Protokoll filtern)
+
+Offene Punkte: Einladen weiterer Personen und Aufbewahrungsfristen (Data Retention) sind konzeptionell vorgesehen, aber noch nicht gebaut.

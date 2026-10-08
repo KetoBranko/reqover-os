@@ -89,8 +89,11 @@ export const TOOL_SOURCE: Record<ToolName, string> = {
   phase_vorschlagen: 'Vorschlag',
 }
 
-export function toolDefinitions(): ToolDefinition[] {
-  return Object.entries(ASSISTANT_TOOLS).map(([name, t]) => ({ name, ...t }))
+/** With AI level 1 the assistant only reads; proposal tools are not offered at all. */
+export function toolDefinitions(canPropose = true): ToolDefinition[] {
+  return Object.entries(ASSISTANT_TOOLS)
+    .filter(([name]) => canPropose || !WRITE_TOOLS.has(name as ToolName))
+    .map(([name, t]) => ({ name, ...t }))
 }
 
 const d = (iso: string | null) => (iso ? formatDay(iso) : null)
@@ -98,9 +101,10 @@ const d = (iso: string | null) => (iso ? formatDay(iso) : null)
 type ReadResult = unknown
 export type ToolOutcome = { kind: 'read'; result: ReadResult } | { kind: 'proposal'; action: NewProposalAction; confirmation: string } | { kind: 'error'; message: string }
 
-export async function runTool(ctx: RequestContext, name: string, rawInput: unknown): Promise<ToolOutcome> {
+export async function runTool(ctx: RequestContext, name: string, rawInput: unknown, canPropose = true): Promise<ToolOutcome> {
   if (!(name in ASSISTANT_TOOLS)) return { kind: 'error', message: `Unbekanntes Werkzeug ${name}.` }
   const tool = name as ToolName
+  if (!canPropose && WRITE_TOOLS.has(tool)) return { kind: 'error', message: 'Änderungsvorschläge sind in den Einstellungen ausgeschaltet (AI-Stufe 1).' }
   const parsed = ASSISTANT_TOOLS[tool].schema.safeParse(rawInput)
   if (!parsed.success) return { kind: 'error', message: `Ungültige Eingabe: ${parsed.error.issues.map((i) => i.path.join('.')).join(', ')}` }
   const input = parsed.data as Record<string, unknown>

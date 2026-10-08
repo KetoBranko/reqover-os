@@ -61,16 +61,18 @@ export interface AIProvider {
 export type AIStatus = { available: true; provider: AIProvider['id'] } | { available: false; reason: string }
 
 /** Whether AI can run at all; the UI shows the reason instead of a dead button. */
-export function aiStatus(aiLevel: number): AIStatus {
-  if (aiLevel < 2) return { available: false, reason: 'AI-Vorschläge sind in den Einstellungen deaktiviert.' }
+/** need: 1 = read and analyse (assistant answers), 2 = propose changes (spec 20). */
+export function aiStatus(aiLevel: number, need: 1 | 2 = 2): AIStatus {
+  if (aiLevel < 1) return { available: false, reason: 'AI ist in den Einstellungen ausgeschaltet.' }
+  if (aiLevel < need) return { available: false, reason: 'AI-Vorschläge sind in den Einstellungen deaktiviert.' }
   const e = env()
   if (e.AI_PROVIDER === 'fake') return { available: true, provider: 'fake' }
   if (e.AI_PROVIDER === 'anthropic' && e.ANTHROPIC_API_KEY) return { available: true, provider: 'anthropic' }
   return { available: false, reason: 'AI ist noch nicht eingerichtet. Dafür wird ein API-Schlüssel benötigt; alle Funktionen bleiben manuell nutzbar.' }
 }
 
-export async function getProvider(aiLevel: number): Promise<AIProvider> {
-  const status = aiStatus(aiLevel)
+export async function getProvider(aiLevel: number, need: 1 | 2 = 2): Promise<AIProvider> {
+  const status = aiStatus(aiLevel, need)
   if (!status.available) throw new DomainError('unavailable', status.reason)
   if (status.provider === 'fake') return (await import('./fake')).fakeProvider
   return (await import('./anthropic')).anthropicProvider()
