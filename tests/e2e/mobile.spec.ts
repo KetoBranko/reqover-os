@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { login } from './support'
 
-const PAGES = ['/', '/aufgaben', '/unternehmen', '/kontakte', '/pipeline', '/discovery', '/discovery/validierung', '/aktivitaeten', '/assistent', '/einstellungen']
+const PAGES = ['/', '/aufgaben', '/unternehmen', '/kontakte', '/pipeline', '/discovery', '/discovery/validierung', '/aktivitaeten', '/assistent', '/einstellungen', '/einstellungen/protokoll']
 
 test('Kernseiten ohne seitliches Scrollen, App installierbar', async ({ page, request }, info) => {
   await login(page)

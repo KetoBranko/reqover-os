@@ -24,7 +24,7 @@ export default function AssistantPage({ searchParams }: PageProps<'/assistent'>)
 
 async function AssistantContent({ frage }: { frage?: string }) {
   const session = await requireSession()
-  const ai = aiStatus(session.organization.settings.aiLevel)
+  const ai = aiStatus(session.organization.settings.aiLevel, 1)
   if (!ai.available) {
     return (
       <>
