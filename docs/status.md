@@ -144,3 +144,20 @@ Offene Punkte: Datumsfelder zeigen das Format des Geräts (auf deutschen Geräte
 - Tests: 22 Unit, 81 DB (neu: Rollen und RLS bei Einstellungen, AI-Stufe 1, Protokoll, Export-Trennung, Demo-Entfernung, Organisationslöschung inkl. Gegenprobe), 20 E2E (neu: Pilotangebot ändern, Export herunterladen, Protokoll filtern)
 
 Offene Punkte: Einladen weiterer Personen und Aufbewahrungsfristen (Data Retention) sind konzeptionell vorgesehen, aber noch nicht gebaut.
+
+## Phase 12 – Sicherheitsprüfung · abgeschlossen 08.10.2026
+
+- Geprüft:
+  - RLS auf allen 20 Tabellen
+  - `security definer`-Funktionen mit festem `search_path`; `anon` ohne Rechte
+  - jede Server-Aktion über `runAction` mit Zod (Onboarding prüft selbst)
+  - kein `dangerouslySetInnerHTML`; Login-Weiterleitung nur auf eigene Pfade
+  - keine Secrets im Repo; `npm audit` meldet 0 Schwachstellen
+  - Produktions-Build läuft durch
+- Neu:
+  - Sicherheits-Header (CSP, Frame-Schutz, nosniff, Referrer- und Permissions-Policy, HSTS in Produktion); `X-Powered-By` aus
+  - gemeinsame Anfragebegrenzung (`src/server/rate-limit.ts`) für Assistent, Gesprächsanalyse und Transkription
+- `docs/sicherheit.md`: was gebaut ist, welche Daten an welche Anbieter gehen und was noch konzeptionell ist (Aufbewahrungsfristen, Backups, Uploads). Ohne Compliance-Versprechen
+- Tests: 22 Unit, 81 DB, 22 E2E (neu: Header und geschützte Endpunkte ohne Sitzung)
+
+Offene Punkte: Die CSP erlaubt Inline-Skripte, weil Next.js beim Streaming darauf angewiesen ist; Nonces würden das Vorrendern abschalten. Die Anfragebegrenzung gilt je Server-Instanz.
