@@ -46,3 +46,16 @@ Offene Punkte: Spalte „Pipeline“ in der Unternehmensliste bleibt leer, bis P
 - Tests: 9 Unit, 57 DB (neu: Antwortvalidierung je Fragetyp, Bestätigung, Abschluss/Events, Mandantentrennung), E2E Desktop + Mobil: starten → Kernfrage → beenden → Fragen → Score → Abschluss → Reload → Verlauf
 
 Offene Punkte: Das Datumsfeld ist das native Browser-Steuerelement und folgt der Spracheinstellung des Browsers (im deutschen Browser 08.10.2026). „Gespräch analysieren“ folgt mit der AI-Schicht (Phase 7).
+
+## Phase 6 – Übersicht, Morning Briefing, Validierung · abgeschlossen 08.10.2026
+
+- Übersicht als Command Center: Begrüßung nach Tageszeit, „ReQover Briefing“, „Heute wichtig“, acht Kennzahlen (alle verlinkt)
+- Briefing und Priorisierung sind feste Regeln in `src/domain/briefing.ts` (keine AI). Auslöser: überfällige/heutige Aufgaben und Wiedervorlagen, Chance ohne nächsten Schritt, ≥ 14 Tage ohne Aktivität, abgeschlossenes Discovery ohne Folgeschritt. Verstärker: Bedarf bestätigt, Evidence Score ≥ 14, Preis akzeptiert, Phase Pilot-Chance/Angebot. Verstärker allein machen nichts dringend. Ab 50 Punkten „Hohe Priorität“
+- „Warum?“ an jeder Empfehlung zeigt Begründung, Einzelgewichte und Summe (funktioniert ohne JavaScript)
+- „Seit deinem letzten Besuch“: der Bezugszeitpunkt wird einmal pro Tag (Europe/Berlin) weitergeschoben und bleibt beim Neuladen stabil
+- Fehlende Daten werden benannt („Dazu liegen mir noch keine ausreichenden Daten vor.“), es gibt keine erfundenen Aussagen
+- Validierungs-Dashboard (Discovery → Validierung): sechs Signale als x/N, dazu Nein/Unklar, Pilotangebot und Gewonnen je Unternehmen (auch nach späterem Verlust gezählt). Außerdem die häufigsten Pains, Use Cases, Einwände, Gründe gegen externe Bearbeitung und gewünschte Kennzahlen. Unter 5 Gesprächen erscheint der Hinweis „Kleine Stichprobe“
+- Gesprächsvorbereitung je Unternehmen (`/unternehmen/[id]/vorbereitung`, Knopf „Vorbereiten“): Warum jetzt, letztes Discovery, offene Kernfragen, Fakten/Hypothesen/Kundenaussagen, Ansprechpartner, Chancen, Aufgaben, Pilotangebot, letzte Aktivitäten
+- Tests: 17 Unit, 63 DB (neu: Kennzahlen, Priorisierung aus echten Daten, Basis „seit letztem Besuch“, Pilotangebot nach Verlust, Mandantentrennung), 8 E2E (neu: Übersicht → Warum? → Vorbereiten → Validierung, Desktop + Mobil)
+
+Offene Punkte: Die Gewichte sind ein erster Vorschlag und liegen zentral in `REASON_WEIGHT`.
