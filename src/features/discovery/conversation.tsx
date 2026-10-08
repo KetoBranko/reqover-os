@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ChevronDown, Square } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { useAction } from '@/components/forms/use-action'
 import { CORE_QUESTION } from '@/domain/discovery'
 import { de } from '@/i18n/de'
@@ -15,7 +14,7 @@ import { ElapsedTimer } from './timer'
 
 /**
  * Reduced conversation mode: company, contact, timer, the core questions and
- * one big notes area. Nothing is recorded; dictation is for own notes (Phase 8).
+ * one big notes area. Nothing is recorded; dictation is only for own notes.
  */
 export function ConversationMode({
   discoveryId,
@@ -85,12 +84,10 @@ export function ConversationMode({
             initial={rawNotes}
             rows={14}
             big
+            dictation
             placeholder="Stichpunkte während des Gesprächs. Wird automatisch gespeichert."
           />
-          <p className="flex items-center gap-2 text-[12px] text-faint">
-            Diktieren eigener Notizen <Badge>{de.common.comingSoon}</Badge>
-            <span>· Das Gespräch selbst wird nicht aufgezeichnet.</span>
-          </p>
+          <p className="text-[12px] text-faint">Diktiert werden nur deine eigenen Notizen, solange du das Mikrofon einschaltest. Das Gespräch selbst wird nicht aufgezeichnet.</p>
         </section>
 
         <aside className="lg:sticky lg:top-20 lg:max-h-[calc(100dvh-6rem)] lg:overflow-y-auto">

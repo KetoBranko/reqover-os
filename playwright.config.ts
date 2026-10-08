@@ -14,7 +14,9 @@ export default defineConfig({
     locale: 'de-DE',
     timezoneId: 'Europe/Berlin',
     trace: 'retain-on-failure',
-    launchOptions: executablePath ? { executablePath } : {},
+    // Dictation tests use Chromium's fake microphone; the server side runs the STT test double.
+    permissions: ['microphone'],
+    launchOptions: { ...(executablePath ? { executablePath } : {}), args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'] },
   },
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },

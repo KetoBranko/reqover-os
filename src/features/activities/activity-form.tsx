@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Field, Input, Select, Textarea } from '@/components/ui/input'
+import { appendText, DictateButton } from '@/features/voice/dictate'
 import { useAction } from '@/components/forms/use-action'
 import { MANUAL_ACTIVITY_TYPES } from '@/domain/schemas'
 import { de } from '@/i18n/de'
@@ -107,7 +108,8 @@ export function ActivityFormDialog({
           <Field label="Inhalt" htmlFor="a-body">
             <Textarea id="a-body" value={body} onChange={(e) => setBody(e.target.value)} rows={5} autoFocus placeholder="Was wurde besprochen?" />
           </Field>
-          {bodySlot?.((text) => setBody((b) => (b ? `${b}\n${text}` : text)))}
+          <DictateButton label="Notiz diktieren" onText={(t) => setBody((b) => appendText(b, t))} />
+          {bodySlot?.((text) => setBody((b) => appendText(b, text)))}
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Zeitpunkt" htmlFor="a-when">
               <Input id="a-when" name="occurredAt" type="datetime-local" defaultValue={localDateTimeValue()} />

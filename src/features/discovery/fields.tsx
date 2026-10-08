@@ -9,6 +9,7 @@ import { parseRange, type AnswerType } from '@/domain/discovery'
 import { formatNumber } from '@/lib/format'
 import type { DiscoveryNotes } from '@/domain/schemas'
 import { saveAnswerAction, saveDiscoveryNotesAction } from './actions'
+import { appendText, DictateButton } from '@/features/voice/dictate'
 
 export function SaveHint({ state, className }: { state: SaveState; className?: string }) {
   if (state === 'idle') return null
@@ -32,6 +33,7 @@ export function NoteField({
   placeholder,
   disabled,
   big,
+  dictation,
 }: {
   discoveryId: string
   field: TextNoteKey
@@ -42,6 +44,8 @@ export function NoteField({
   placeholder?: string
   disabled?: boolean
   big?: boolean
+  /** Shows a dictation button; dictated text is appended and saved like typed text. */
+  dictation?: boolean
 }) {
   const [value, setValue] = useState(initial ?? '')
   const save = useAutosave((v: string) => saveDiscoveryNotesAction({ id: discoveryId, data: { [field]: v } satisfies DiscoveryNotes }))
@@ -54,6 +58,16 @@ export function NoteField({
         </label>
         <SaveHint state={save.state} />
       </div>
+      {dictation && !disabled && (
+        <DictateButton
+          label="Notiz diktieren"
+          onText={(t) => {
+            const next = appendText(value, t)
+            setValue(next)
+            void save.flush(next)
+          }}
+        />
+      )}
       <Textarea
         id={id}
         value={value}

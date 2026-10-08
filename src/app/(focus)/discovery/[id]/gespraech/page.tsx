@@ -5,6 +5,8 @@ import { requireSession } from '@/server/auth/session'
 import { getDiscovery } from '@/server/services/discovery'
 import { Skeleton } from '@/components/ui/states'
 import { ConversationMode } from '@/features/discovery/conversation'
+import { VoiceConfig } from '@/features/voice/voice-config'
+import { voiceMode } from '@/server/stt/provider'
 
 export const metadata: Metadata = { title: 'Gesprächsmodus' }
 
@@ -25,16 +27,19 @@ async function Conversation({ id }: { id: string }) {
   if (!d) notFound()
   if (d.interview.status !== 'in_progress' || !d.interview.startedAt) redirect(`/discovery/${id}`)
   return (
-    <ConversationMode
-      discoveryId={id}
-      companyId={d.interview.companyId}
-      companyName={d.companyName}
-      contactName={d.contactName}
-      startedAt={d.interview.startedAt.toISOString()}
-      questions={d.questions}
-      answers={d.answers}
-      rawNotes={d.interview.rawNotes}
-      coreAnswer={d.interview.coreQuestionAnswer}
-    />
+    <>
+      <VoiceConfig value={voiceMode()} />
+      <ConversationMode
+        discoveryId={id}
+        companyId={d.interview.companyId}
+        companyName={d.companyName}
+        contactName={d.contactName}
+        startedAt={d.interview.startedAt.toISOString()}
+        questions={d.questions}
+        answers={d.answers}
+        rawNotes={d.interview.rawNotes}
+        coreAnswer={d.interview.coreQuestionAnswer}
+      />
+    </>
   )
 }
