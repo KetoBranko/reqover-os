@@ -23,7 +23,7 @@ export function OutcomeDialog({
   outcome: 'won' | 'lost'
   title: string
   pending: boolean
-  onConfirm: (data: { orderConfirmedAt?: string; lostReason?: string }) => void
+  onConfirm: (data: { orderConfirmedAt?: string; lostReason?: string; wonWithoutOrder?: boolean }) => void
   onCancel: () => void
 }) {
   const [date, setDate] = useState(berlinDay())
@@ -47,7 +47,7 @@ export function OutcomeDialog({
         title={outcome === 'won' ? `„${title}“ als ${de.pipelineStage.won} markieren` : `„${title}“ als ${de.pipelineStage.lost} markieren`}
         description={
           outcome === 'won'
-            ? 'Gewonnen zählt nur mit dokumentiertem Auftrag. Wann wurde der Auftrag bestätigt?'
+            ? 'Eine bestätigte Beauftragung ist nicht hinterlegt. Wann wurde der Auftrag bestätigt?'
             : 'Warum ist die Chance verloren? Der Grund fließt in die Validierung ein.'
         }
       >
@@ -76,12 +76,17 @@ export function OutcomeDialog({
               </Field>
             </>
           )}
-          <div className="flex justify-end gap-2 border-t border-line pt-4">
+          <div className="flex flex-col-reverse gap-2 border-t border-line pt-4 sm:flex-row sm:justify-end">
             <Button type="button" variant="ghost" onClick={onCancel}>
               {de.common.cancel}
             </Button>
+            {outcome === 'won' && (
+              <Button type="button" variant="outline" disabled={pending} onClick={() => onConfirm({ wonWithoutOrder: true })}>
+                Trotzdem als gewonnen markieren
+              </Button>
+            )}
             <Button type="submit" variant={outcome === 'won' ? 'primary' : 'danger'} loading={pending}>
-              {outcome === 'won' ? 'Als gewonnen speichern' : 'Als verloren speichern'}
+              {outcome === 'won' ? 'Mit Auftrag speichern' : 'Als verloren speichern'}
             </Button>
           </div>
         </form>

@@ -50,6 +50,7 @@ test('Chance anlegen, verschieben, gewinnen nur mit Auftrag, verlieren nur mit G
   // Gewonnen ohne Auftrag → Datenqualitäts-Dialog.
   await moveTo('Gewonnen')
   const won = page.getByRole('dialog', { name: /als Gewonnen markieren/ })
+  await expect(won.getByRole('button', { name: 'Trotzdem als gewonnen markieren' })).toBeVisible()
   await expect(won).toBeVisible()
   await won.getByRole('button', { name: 'Abbrechen' }).click()
   await expect(won).toBeHidden()

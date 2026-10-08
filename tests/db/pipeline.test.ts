@@ -38,7 +38,7 @@ describe('Vertriebspipeline', () => {
 
   it('Phasenwechsel schreibt Verlauf und Events', async () => {
     const o = await newOpp('Pilot B')
-    await withUserTx(a, (tx) => moveOpportunity(tx, a, { id: o.id, stageKey: 'proposal', orderConfirmedAt: null, lostReason: null }))
+    await withUserTx(a, (tx) => moveOpportunity(tx, a, { id: o.id, stageKey: 'proposal', orderConfirmedAt: null, lostReason: null, wonWithoutOrder: false }))
     const { items } = await listTimeline(a, { companyId })
     const change = items.find((i) => i.activity.opportunityId === o.id && i.activity.type === 'stage_change')
     expect(change?.activity.title).toBe('Pilot B: Kontakt aufnehmen → Angebot')
@@ -48,23 +48,36 @@ describe('Vertriebspipeline', () => {
 
   it('„Gewonnen“ verlangt einen dokumentierten Auftrag', async () => {
     const o = await newOpp('Pilot C')
-    await expect(withUserTx(a, (tx) => moveOpportunity(tx, a, { id: o.id, stageKey: 'won', orderConfirmedAt: null, lostReason: null }))).rejects.toMatchObject({
+    await expect(withUserTx(a, (tx) => moveOpportunity(tx, a, { id: o.id, stageKey: 'won', orderConfirmedAt: null, lostReason: null, wonWithoutOrder: false }))).rejects.toMatchObject({
       code: 'needs_confirmation',
       details: { required: 'orderConfirmedAt' },
     })
-    await withUserTx(a, (tx) => moveOpportunity(tx, a, { id: o.id, stageKey: 'won', orderConfirmedAt: '2026-10-08', lostReason: null }))
+    await withUserTx(a, (tx) => moveOpportunity(tx, a, { id: o.id, stageKey: 'won', orderConfirmedAt: '2026-10-08', lostReason: null, wonWithoutOrder: false }))
     const [row] = await admin`select closed_at, order_confirmed_at::text from opportunities where id = ${o.id}`
     expect(row?.order_confirmed_at).toBe('2026-10-08')
     expect(row?.closed_at).not.toBeNull()
   })
 
+  it('„Trotzdem als gewonnen“ ist eine ausdrückliche, dokumentierte Entscheidung', async () => {
+    const o = await newOpp('Pilot C2')
+    await withUserTx(a, (tx) => moveOpportunity(tx, a, { id: o.id, stageKey: 'won', orderConfirmedAt: null, lostReason: null, wonWithoutOrder: true }))
+    const [row] = await admin`select won_without_order, order_confirmed_at from opportunities where id = ${o.id}`
+    expect(row).toEqual({ won_without_order: true, order_confirmed_at: null })
+    const { items } = await listTimeline(a, { companyId })
+    expect(items.find((i) => i.activity.opportunityId === o.id && i.activity.type === 'stage_change')?.activity.body).toMatch(/ohne dokumentierte Auftragsbestätigung/)
+    // Reopening clears the flag again.
+    await withUserTx(a, (tx) => moveOpportunity(tx, a, { id: o.id, stageKey: 'proposal', orderConfirmedAt: null, lostReason: null, wonWithoutOrder: false }))
+    const [reopened] = await admin`select won_without_order from opportunities where id = ${o.id}`
+    expect(reopened?.won_without_order).toBe(false)
+  })
+
   it('„Verloren“ verlangt einen Grund; Wiedereröffnen setzt closed_at zurück', async () => {
     const o = await newOpp('Pilot D')
-    await expect(withUserTx(a, (tx) => moveOpportunity(tx, a, { id: o.id, stageKey: 'lost', orderConfirmedAt: null, lostReason: null }))).rejects.toMatchObject({
+    await expect(withUserTx(a, (tx) => moveOpportunity(tx, a, { id: o.id, stageKey: 'lost', orderConfirmedAt: null, lostReason: null, wonWithoutOrder: false }))).rejects.toMatchObject({
       code: 'needs_confirmation',
     })
-    await withUserTx(a, (tx) => moveOpportunity(tx, a, { id: o.id, stageKey: 'lost', orderConfirmedAt: null, lostReason: 'Kein Budget' }))
-    await withUserTx(a, (tx) => moveOpportunity(tx, a, { id: o.id, stageKey: 'contacted', orderConfirmedAt: null, lostReason: null }))
+    await withUserTx(a, (tx) => moveOpportunity(tx, a, { id: o.id, stageKey: 'lost', orderConfirmedAt: null, lostReason: 'Kein Budget', wonWithoutOrder: false }))
+    await withUserTx(a, (tx) => moveOpportunity(tx, a, { id: o.id, stageKey: 'contacted', orderConfirmedAt: null, lostReason: null, wonWithoutOrder: false }))
     const [row] = await admin`select closed_at, lost_reason from opportunities where id = ${o.id}`
     expect(row).toEqual({ closed_at: null, lost_reason: null })
   })
@@ -75,6 +88,11 @@ describe('Vertriebspipeline', () => {
     await expectDbError(
       withUserTx(a, (tx) => tx.execute(`update opportunities set stage_id = '${lost!.id}' where id = '${o.id}'`)),
       /requires lost_reason/,
+    )
+    const [won] = await admin`select s.id from pipeline_stages s join pipelines p on p.id = s.pipeline_id where p.organization_id = ${a.organizationId} and s.key = 'won'`
+    await expectDbError(
+      withUserTx(a, (tx) => tx.execute(`update opportunities set stage_id = '${won!.id}' where id = '${o.id}'`)),
+      /requires order_confirmed_at/,
     )
     // A stage from another organization's pipeline is rejected.
     const [foreign] = await admin`select s.id from pipeline_stages s join pipelines p on p.id = s.pipeline_id where p.organization_id = ${b.organizationId} and s.key = 'contacted'`
@@ -88,7 +106,7 @@ describe('Vertriebspipeline', () => {
   it('andere Organisationen sehen und bewegen keine fremden Chancen', async () => {
     const o = await newOpp('Pilot G')
     expect((await getBoard(b)).cards).toEqual([])
-    await expect(withUserTx(b, (tx) => moveOpportunity(tx, b, { id: o.id, stageKey: 'contacted', orderConfirmedAt: null, lostReason: null }))).rejects.toMatchObject({
+    await expect(withUserTx(b, (tx) => moveOpportunity(tx, b, { id: o.id, stageKey: 'contacted', orderConfirmedAt: null, lostReason: null, wonWithoutOrder: false }))).rejects.toMatchObject({
       code: 'not_found',
     })
   })

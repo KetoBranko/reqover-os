@@ -32,6 +32,7 @@ export interface BoardCard {
   stageChangedAt: Date
   lostReason: string | null
   orderConfirmedAt: string | null
+  wonWithoutOrder: boolean
   isDemo: boolean
 }
 
@@ -69,6 +70,7 @@ export async function getBoard(ctx: RequestContext, opts: { q?: string } = {}) {
         stageChangedAt: opportunities.stageChangedAt,
         lostReason: opportunities.lostReason,
         orderConfirmedAt: opportunities.orderConfirmedAt,
+        wonWithoutOrder: opportunities.wonWithoutOrder,
         isDemo: opportunities.isDemo,
       })
       .from(opportunities)
@@ -141,7 +143,7 @@ export async function moveOpportunity(tx: Tx, ctx: RequestContext, input: Opport
 
   const orderConfirmedAt = input.orderConfirmedAt ?? current.opp.orderConfirmedAt
   const lostReason = input.lostReason ?? (target.outcome === 'lost' ? current.opp.lostReason : null)
-  if (target.outcome === 'won' && !orderConfirmedAt) {
+  if (target.outcome === 'won' && !orderConfirmedAt && !input.wonWithoutOrder) {
     throw new DomainError('needs_confirmation', 'Für „Gewonnen“ fehlt der dokumentierte Auftrag.', { required: 'orderConfirmedAt' })
   }
   if (target.outcome === 'lost' && !lostReason) {
@@ -153,6 +155,7 @@ export async function moveOpportunity(tx: Tx, ctx: RequestContext, input: Opport
     .set({
       stageId: target.id,
       orderConfirmedAt: target.outcome === 'won' ? orderConfirmedAt : current.opp.orderConfirmedAt,
+      wonWithoutOrder: target.outcome === 'won' && !orderConfirmedAt,
       lostReason: target.outcome === 'lost' ? lostReason : null,
     })
     .where(eq(opportunities.id, input.id))
@@ -165,11 +168,16 @@ export async function moveOpportunity(tx: Tx, ctx: RequestContext, input: Opport
     {
       type: 'stage_change',
       title: `${row!.title}: ${de.pipelineStage[from]} → ${de.pipelineStage[target.key as PipelineStageKey]}`,
-      body: target.outcome === 'lost' ? `Grund: ${lostReason}` : null,
+      body:
+        target.outcome === 'lost'
+          ? `Grund: ${lostReason}`
+          : target.outcome === 'won' && !orderConfirmedAt
+            ? 'Als gewonnen markiert, ohne dokumentierte Auftragsbestätigung.'
+            : null,
       companyId: row!.companyId,
       contactId: row!.primaryContactId,
       opportunityId: row!.id,
-      metadata: { field: 'opportunity.stage', from, to: target.key },
+      metadata: { field: 'opportunity.stage', from, to: target.key, ...(target.outcome === 'won' && !orderConfirmedAt ? { wonWithoutOrder: true } : {}) },
     },
     opts,
   )

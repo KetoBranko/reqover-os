@@ -47,9 +47,10 @@ export function Board({ stages, cards, today, contacts }: { stages: BoardStage[]
   const stageOf = (c: BoardCard) => overrides[c.id] ?? c.stageId
   const byStage = (stageId: string) => cards.filter((c) => stageOf(c) === stageId)
 
-  async function requestMove(card: BoardCard, stage: BoardStage, extra: { orderConfirmedAt?: string; lostReason?: string } = {}) {
-    if (stageOf(card) === stage.id && !extra.orderConfirmedAt && !extra.lostReason) return
-    if (stage.outcome !== 'open' && !extra.orderConfirmedAt && !extra.lostReason) {
+  async function requestMove(card: BoardCard, stage: BoardStage, extra: { orderConfirmedAt?: string; lostReason?: string; wonWithoutOrder?: boolean } = {}) {
+    const decided = Boolean(extra.orderConfirmedAt || extra.lostReason || extra.wonWithoutOrder)
+    if (stageOf(card) === stage.id && !decided) return
+    if (stage.outcome !== 'open' && !decided) {
       // Ask first: closing an opportunity needs evidence (order) or a reason.
       if (stage.outcome === 'won' && !card.orderConfirmedAt) return setOutcome({ card, stage })
       if (stage.outcome === 'lost') return setOutcome({ card, stage })
@@ -241,7 +242,7 @@ function CardBody({
 }) {
   const daysInStage = daysBetween(berlinDay(new Date(card.stageChangedAt)), today)
   const overdue = card.nextStepDate != null && card.nextStepDate < today
-  const isClosed = card.lostReason != null || card.orderConfirmedAt != null
+  const isClosed = card.lostReason != null || card.orderConfirmedAt != null || card.wonWithoutOrder
   return (
     <div className={cn(overlay && 'w-60 rounded-lg border border-accent/50 bg-surface-2 p-3 shadow-2xl')}>
       <div className="flex items-start gap-1.5">
@@ -278,6 +279,7 @@ function CardBody({
         </p>
       )}
       {card.lostReason && <p className="mt-2 text-[12px] text-danger">Grund: {card.lostReason}</p>}
+      {card.wonWithoutOrder && <p className="mt-2 text-[12px] text-warning">Ohne dokumentierten Auftrag</p>}
       {!isClosed && daysInStage >= STALE_DAYS && (
         <p className="mt-2 text-[12px] text-warning">Seit {daysInStage} Tagen in dieser Phase</p>
       )}

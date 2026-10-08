@@ -146,6 +146,8 @@ export const opportunityMove = z.object({
   id: uuid,
   stageKey: z.enum(PIPELINE_STAGE_KEYS),
   orderConfirmedAt: optionalDay,
+  /** Explicit "Trotzdem als gewonnen markieren" without a documented order. */
+  wonWithoutOrder: z.boolean().default(false),
   lostReason: optionalText(1000),
 })
 export type OpportunityMove = z.infer<typeof opportunityMove>

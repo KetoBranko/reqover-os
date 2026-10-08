@@ -28,7 +28,7 @@ Offene Punkte: Spalte „Pipeline“ in der Unternehmensliste bleibt leer, bis P
 
 - Board mit den 9 Phasen; Desktop: Drag & Drop (auch per Tastatur) plus Menü „Phase ändern“ an jeder Karte; Mobil: gruppierte Liste mit Phasen-Auswahl
 - Karten zeigen Unternehmen, Wert, Ansprechpartner, nächsten Schritt (überfällig rot), Hinweis bei fehlendem nächsten Schritt und bei ≥ 14 Tagen in derselben Phase; Spaltensummen und offener Gesamtwert
-- Datenqualität: „Gewonnen“ nur mit Datum der Auftragsbestätigung, „Verloren“ nur mit Grund (Schnellauswahl häufiger Gründe). Durchgesetzt in Service **und** Datenbank-Trigger (Migration 0003), der auch prüft, dass die Phase zur Pipeline der Organisation gehört, und `stage_changed_at`/`closed_at` selbst pflegt
+- Datenqualität (Spec 34: unterstützen, nicht bevormunden): „Gewonnen“ fragt nach dem Datum der Auftragsbestätigung und bietet „Trotzdem als gewonnen markieren“ (wird als `won_without_order` gespeichert, im Verlauf vermerkt und auf der Karte angezeigt); „Verloren“ nur mit Grund (Schnellauswahl). Durchgesetzt in Service **und** Datenbank-Trigger (Migrationen 0003/0004), der auch prüft, dass die Phase zur Pipeline der Organisation gehört, und `stage_changed_at`/`closed_at` selbst pflegt
 - Jeder Phasenwechsel schreibt einen Verlaufseintrag und Events (`OPPORTUNITY_STAGE_CHANGED`, `PILOT_PROPOSED`, `PILOT_WON`, `PILOT_LOST`)
 - Chancen-Tab in der Unternehmens-360°-Sicht; Schnellaktion „Neue Chance anlegen“ in der Befehlsleiste; Demo-Seed um 4 Chancen erweitert
 - Tests: 50 DB (neu: 7 Pipeline-Tests inkl. direkter Datenbank-Umgehungsversuche), E2E Desktop + Mobil: anlegen → ziehen → Menü → Gewonnen-Dialog → Verloren mit Grund → Reload → Verlauf

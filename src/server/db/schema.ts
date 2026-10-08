@@ -174,6 +174,7 @@ export const opportunities = pgTable('opportunities', {
   nextStep: text('next_step'),
   nextStepDate: date('next_step_date', { mode: 'string' }),
   orderConfirmedAt: date('order_confirmed_at', { mode: 'string' }),
+  wonWithoutOrder: boolean('won_without_order').notNull().default(false),
   lostReason: text('lost_reason'),
   stageChangedAt: ts('stage_changed_at').notNull().defaultNow(),
   closedAt: ts('closed_at'),
