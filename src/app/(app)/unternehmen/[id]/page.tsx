@@ -17,6 +17,9 @@ import { TaskList } from '@/features/tasks/task-list'
 import { NewActivityButton } from '@/features/activities/activity-form'
 import { Timeline } from '@/features/activities/timeline'
 import { NewOpportunityButton } from '@/features/pipeline/opportunity-form'
+import { StartDiscoveryButton } from '@/features/discovery/start-dialog'
+import { DiscoveryList } from '@/features/discovery/discovery-list'
+import { listDiscoveries } from '@/server/services/discovery'
 import { de } from '@/i18n/de'
 import { berlinDay, formatDate, formatMoney, formatNumber, relativeDay } from '@/lib/format'
 
@@ -45,7 +48,7 @@ function CompanySkeleton() {
 async function CompanyView({ id }: { id: string }) {
   const session = await requireSession()
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound()
-  const data = await getCompany360(session.ctx, id)
+  const [data, discoveries] = await Promise.all([getCompany360(session.ctx, id), listDiscoveries(session.ctx, { companyId: id })])
   if (!data) notFound()
   const { company } = data
   const today = berlinDay()
@@ -74,7 +77,7 @@ async function CompanyView({ id }: { id: string }) {
           <TabsTrigger value="overview">Übersicht</TabsTrigger>
           <TabsTrigger value="contacts">Kontakte · {data.contacts.length}</TabsTrigger>
           <TabsTrigger value="activities">Aktivitäten</TabsTrigger>
-          <TabsTrigger value="discovery">Discovery</TabsTrigger>
+          <TabsTrigger value="discovery">Discovery · {discoveries.length}</TabsTrigger>
           <TabsTrigger value="opportunities">Chancen · {data.opportunities.length}</TabsTrigger>
           <TabsTrigger value="tasks">Aufgaben · {data.openTasks.length}</TabsTrigger>
           <TabsTrigger value="documents">Dokumente</TabsTrigger>
@@ -122,7 +125,15 @@ async function CompanyView({ id }: { id: string }) {
         </TabsContent>
 
         <TabsContent value="discovery" className="mt-5">
-          <EmptyState title="Discovery" description="Discovery-Gespräche zu diesem Unternehmen erscheinen hier." actions={<Badge>{de.common.comingSoon}</Badge>} />
+          <div className="mb-3 flex flex-wrap justify-end gap-2">
+            <StartDiscoveryButton mode="document" companyId={company.id} contacts={contactOptions} />
+            <StartDiscoveryButton mode="live" companyId={company.id} contacts={contactOptions} variant="secondary" />
+          </div>
+          {discoveries.length === 0 ? (
+            <EmptyState title="Noch keine Discovery-Gespräche" description="Starte ein Gespräch oder dokumentiere ein bereits geführtes Gespräch." />
+          ) : (
+            <DiscoveryList items={discoveries} showCompany={false} />
+          )}
         </TabsContent>
 
         <TabsContent value="opportunities" className="mt-5">

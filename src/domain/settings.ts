@@ -32,3 +32,9 @@ export function parseOrganizationSettings(raw: unknown): OrganizationSettings {
   if (!parsed.success) return DEFAULT_SETTINGS
   return { ...parsed.data, aiLevel: Math.min(parsed.data.aiLevel, MAX_AI_LEVEL_V1) }
 }
+
+/** Reads a stored pilot-offer snapshot; null when absent or malformed. */
+export function parsePilotOffer(raw: unknown): PilotOffer | null {
+  const parsed = pilotOfferSchema.safeParse(raw)
+  return parsed.success ? parsed.data : null
+}

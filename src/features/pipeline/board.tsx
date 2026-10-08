@@ -267,6 +267,11 @@ function CardBody({
       <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-faint">
         {card.valueCents != null && <span className="tabular text-fg">{formatMoney(card.valueCents)}</span>}
         {card.contactName && <span>{card.contactName}</span>}
+        {card.evidence && (
+          <span title={`${card.evidence.rated} von 10 Kategorien bewertet`} className="text-muted">
+            Evidence {card.evidence.points}/20
+          </span>
+        )}
         {card.isDemo && <DemoBadge />}
       </div>
       {card.nextStep && (
@@ -277,6 +282,9 @@ function CardBody({
             {card.nextStepDate && ` · ${relativeDay(card.nextStepDate, today)}`}
           </span>
         </p>
+      )}
+      {card.lastActivityAt && (
+        <p className="mt-2 text-[12px] text-faint">Letzte Aktivität: {relativeDay(berlinDay(new Date(card.lastActivityAt)), today)}</p>
       )}
       {card.lostReason && <p className="mt-2 text-[12px] text-danger">Grund: {card.lostReason}</p>}
       {card.wonWithoutOrder && <p className="mt-2 text-[12px] text-warning">Ohne dokumentierten Auftrag</p>}

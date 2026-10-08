@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Command } from 'cmdk'
 import * as D from '@radix-ui/react-dialog'
-import { Building2, CheckSquare, Columns3, CornerDownLeft, Search, User, UserPlus, Plus, type LucideIcon } from 'lucide-react'
+import { Building2, CheckSquare, Columns3, MessagesSquare, CornerDownLeft, Search, User, UserPlus, Plus, type LucideIcon } from 'lucide-react'
 import { PRIMARY_NAV, SECONDARY_NAV } from '@/components/shell/nav'
 import { formatDay } from '@/lib/format'
 import { de } from '@/i18n/de'
@@ -30,6 +30,7 @@ export function CommandLauncher() {
 const QUICK_ACTIONS: { label: string; href: string; icon: LucideIcon; keywords: string[] }[] = [
   { label: 'Neues Unternehmen anlegen', href: '/unternehmen?neu=', icon: Building2, keywords: ['firma', 'anlegen', 'neu'] },
   { label: 'Neuen Kontakt anlegen', href: '/kontakte?neu=', icon: UserPlus, keywords: ['person', 'ansprechpartner', 'neu'] },
+  { label: 'Discovery starten', href: '/discovery?neu=', icon: MessagesSquare, keywords: ['gespräch', 'interview', 'discovery', 'starten'] },
   { label: 'Neue Chance anlegen', href: '/pipeline?neu=', icon: Columns3, keywords: ['opportunity', 'deal', 'pipeline', 'neu'] },
   { label: 'Neue Aufgabe anlegen', href: '/aufgaben?neu=', icon: Plus, keywords: ['todo', 'wiedervorlage', 'erinnerung', 'neu'] },
 ]
