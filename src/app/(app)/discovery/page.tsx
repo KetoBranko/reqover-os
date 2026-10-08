@@ -10,6 +10,7 @@ import { PageHeader } from '@/components/page-header'
 import { EmptyState, Skeleton } from '@/components/ui/states'
 import { StartDiscoveryButton } from '@/features/discovery/start-dialog'
 import { DiscoveryList } from '@/features/discovery/discovery-list'
+import { DiscoveryTabs } from '@/features/discovery/discovery-tabs'
 import { de } from '@/i18n/de'
 
 export const metadata: Metadata = { title: de.nav.discovery }
@@ -42,6 +43,7 @@ async function Content({ neu }: { neu?: string }) {
         description={items.length ? `${items.length} Gespräche · ${completed} abgeschlossen` : 'Strukturierte Gespräche, um den Bedarf zu validieren.'}
         actions={items.length ? actions : null}
       />
+      <DiscoveryTabs active="list" />
       {!companies.length ? (
         <EmptyState icon={MessagesSquare} title="Noch keine Unternehmen" description="Ein Discovery-Gespräch gehört zu einem Unternehmen. Lege zuerst ein Unternehmen an." />
       ) : !items.length ? (

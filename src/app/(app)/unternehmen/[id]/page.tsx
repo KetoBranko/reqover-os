@@ -9,6 +9,7 @@ import { Skeleton, EmptyState } from '@/components/ui/states'
 import { Card, CardBody, CardHeader } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
+import { buttonVariants } from '@/components/ui/button'
 import { CompanyHeader } from '@/features/companies/company-header'
 import { FactsAndHypotheses } from '@/features/companies/insights-panel'
 import { NewContactButton } from '@/features/contacts/contact-form'
@@ -66,6 +67,9 @@ async function CompanyView({ id }: { id: string }) {
         isDemo={company.isDemo}
         actions={
           <>
+            <Link href={`/unternehmen/${company.id}/vorbereitung`} className={buttonVariants({ variant: 'secondary' })}>
+              Vorbereiten
+            </Link>
             <NewActivityButton label="Notiz" companyId={company.id} contacts={contactOptions} />
             <NewTaskButton label="Aufgabe" variant="secondary" initial={{ companyId: company.id }} contacts={contactOptions} />
           </>
