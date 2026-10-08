@@ -16,7 +16,7 @@ const HISTORY = 12
 
 const WEEKDAY = new Intl.DateTimeFormat('de-DE', { weekday: 'long', timeZone: 'Europe/Berlin' })
 
-function systemPrompt(today: string, firstName: string | null, canPropose: boolean) {
+export function systemPrompt(today: string, firstName: string | null, canPropose: boolean) {
   return `Du bist der ReQover Assistent, die Bedienebene von ReQover OS (B2B Sales Recovery, Validierungsphase). Du sprichst Deutsch, duzt ${firstName ?? 'den Nutzer'} und antwortest knapp und konkret.
 
 Heute ist ${WEEKDAY.format(new Date(`${today}T12:00:00Z`))}, ${today} (Europe/Berlin).

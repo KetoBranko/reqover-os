@@ -8,7 +8,11 @@ import { modelFor, type AIProvider, type ChatMessage, type ChatRequest, type Str
 
 let client: Anthropic | undefined
 
-/** Anthropic adapter: structured output via a forced tool call, validated with Zod. */
+/**
+ * Anthropic adapter: structured output via a single tool the model is instructed to call, validated with Zod.
+ * Current models reject a forced tool_choice, and the extraction schema is too large for strict
+ * grammar-constrained output, so the call is requested in the prompt and the result checked here.
+ */
 export function anthropicProvider(): AIProvider {
   client ??= new Anthropic({ apiKey: env().ANTHROPIC_API_KEY, maxRetries: 2, timeout: 90_000 })
   const api = client
@@ -20,14 +24,14 @@ export function anthropicProvider(): AIProvider {
       try {
         const res = await api.messages.create({
           model,
-          max_tokens: 8000,
-          system: req.system,
+          max_tokens: 16000,
+          system: `${req.system}\n\nGib dein Ergebnis ausschließlich über einen einzigen Aufruf des Werkzeugs "${req.name}" zurück, ohne weiteren Text.`,
           tools: [{ name: req.name, description: 'Gibt das strukturierte Ergebnis zurück.', input_schema: inputSchema }],
-          tool_choice: { type: 'tool', name: req.name },
+          tool_choice: { type: 'auto', disable_parallel_tool_use: true },
           messages: [{ role: 'user', content: `<material>\n${req.input}\n</material>` }],
         })
-        const block = res.content.find((b) => b.type === 'tool_use')
-        if (!block || block.type !== 'tool_use') throw new Error('no tool_use block')
+        const block = res.content.find((b) => b.type === 'tool_use' && b.name === req.name)
+        if (!block || block.type !== 'tool_use') throw new Error(`no tool_use block (stop_reason ${res.stop_reason})`)
         const parsed = req.schema.safeParse(block.input)
         if (!parsed.success) {
           logger.warn('ai.structured_invalid', { model, issues: parsed.error.issues.slice(0, 5).map((i) => i.path.join('.')) })
