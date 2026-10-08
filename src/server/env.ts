@@ -21,11 +21,30 @@ export type ServerEnv = z.infer<typeof schema>
 
 let cached: ServerEnv | undefined
 
+/**
+ * Hosted deployments may give only the database password (SUPABASE_DB_PASSWORD)
+ * instead of a full connection string; the URL is then built for Supabase's
+ * transaction pooler from the project ref and SUPABASE_POOLER_HOST.
+ * Keep in sync with scripts/migrate.mjs.
+ */
+function databaseUrl(): string | undefined {
+  if (process.env.DATABASE_URL) return process.env.DATABASE_URL
+  const password = process.env.SUPABASE_DB_PASSWORD
+  const host = process.env.SUPABASE_POOLER_HOST
+  const ref = process.env.NEXT_PUBLIC_SUPABASE_URL?.match(/^https:\/\/([a-z0-9]+)\.supabase\.co/)?.[1]
+  if (!password || !host || !ref) return undefined
+  return `postgresql://postgres.${ref}:${encodeURIComponent(password)}@${host}:6543/postgres?sslmode=require`
+}
+
 export function env(): ServerEnv {
   if (cached) return cached
   // Claude Code cloud environments do not pass ANTHROPIC_API_KEY through to sessions,
   // so the key may also be stored as REQOVER_ANTHROPIC_API_KEY.
-  const parsed = schema.safeParse({ ...process.env, ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY || process.env.REQOVER_ANTHROPIC_API_KEY })
+  const parsed = schema.safeParse({
+    ...process.env,
+    DATABASE_URL: databaseUrl(),
+    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY || process.env.REQOVER_ANTHROPIC_API_KEY,
+  })
   if (!parsed.success) {
     const fields = parsed.error.issues.map((i) => i.path.join('.')).join(', ')
     throw new Error(`Ungültige oder fehlende Umgebungsvariablen: ${fields}. Siehe .env.example.`)

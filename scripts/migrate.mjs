@@ -4,9 +4,20 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import postgres from 'postgres'
 
-const url = process.env.MIGRATION_DATABASE_URL
+// Hosted deployments may give only SUPABASE_DB_PASSWORD; the URL is then built
+// for Supabase's session pooler (keep in sync with src/server/env.ts).
+function migrationUrl() {
+  if (process.env.MIGRATION_DATABASE_URL) return process.env.MIGRATION_DATABASE_URL
+  const password = process.env.SUPABASE_DB_PASSWORD
+  const host = process.env.SUPABASE_POOLER_HOST
+  const ref = process.env.NEXT_PUBLIC_SUPABASE_URL?.match(/^https:\/\/([a-z0-9]+)\.supabase\.co/)?.[1]
+  if (!password || !host || !ref) return undefined
+  return `postgresql://postgres.${ref}:${encodeURIComponent(password)}@${host}:5432/postgres?sslmode=require`
+}
+
+const url = migrationUrl()
 if (!url) {
-  console.error('MIGRATION_DATABASE_URL fehlt (siehe .env.example).')
+  console.error('MIGRATION_DATABASE_URL bzw. SUPABASE_DB_PASSWORD fehlt (siehe .env.example).')
   process.exit(1)
 }
 
