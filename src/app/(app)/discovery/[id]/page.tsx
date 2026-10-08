@@ -3,6 +3,9 @@ import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import { requireSession } from '@/server/auth/session'
 import { getDiscovery } from '@/server/services/discovery'
+import { latestPendingProposal } from '@/server/services/proposals'
+import { aiStatus } from '@/server/ai/provider'
+import { AnalyzeCard } from '@/features/ai/analyze-card'
 import { Skeleton } from '@/components/ui/states'
 import { Card } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -32,8 +35,9 @@ export default function DiscoveryPage({ params }: PageProps<'/discovery/[id]'>) 
 async function Workspace({ id }: { id: string }) {
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound()
   const session = await requireSession()
-  const d = await getDiscovery(session.ctx, id)
+  const [d, pending] = await Promise.all([getDiscovery(session.ctx, id), latestPendingProposal(session.ctx, id)])
   if (!d) notFound()
+  const ai = aiStatus(session.organization.settings.aiLevel)
   const i = d.interview
   const locked = i.status === 'completed'
   const signals = Object.fromEntries(SIGNALS.map((s) => [s.key, i[s.field]])) as Record<SignalKey, SignalValue>
@@ -57,6 +61,11 @@ async function Workspace({ id }: { id: string }) {
         <p className="mb-4 rounded-lg border border-line bg-surface px-4 py-2.5 text-[13px] text-muted">
           Abgeschlossen. Zum Ändern „Bearbeiten“ wählen; die Auswertung aktualisiert sich danach erneut.
         </p>
+      )}
+      {!locked && (
+        <div className="mb-4">
+          <AnalyzeCard discoveryId={id} unavailableReason={ai.available ? null : ai.reason} pendingProposalId={pending?.id ?? null} />
+        </div>
       )}
       <Tabs defaultValue="conversation">
         <TabsList aria-label="Bereiche">

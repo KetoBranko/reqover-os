@@ -21,6 +21,7 @@ export default defineConfig({
           fileParallelism: false,
           env: {
             APP_ENV: 'test',
+            AI_PROVIDER: 'fake',
             DATABASE_URL: 'postgres://app_server:local-app-server@127.0.0.1:54322/reqover_test',
             TEST_ADMIN_DATABASE_URL: 'postgres://postgres@127.0.0.1:54322/reqover_test',
             NEXT_PUBLIC_SUPABASE_URL: 'http://127.0.0.1:54321',

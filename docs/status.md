@@ -59,3 +59,27 @@ Offene Punkte: Das Datumsfeld ist das native Browser-Steuerelement und folgt der
 - Tests: 17 Unit, 63 DB (neu: Kennzahlen, Priorisierung aus echten Daten, Basis „seit letztem Besuch“, Pilotangebot nach Verlust, Mandantentrennung), 8 E2E (neu: Übersicht → Warum? → Vorbereiten → Validierung, Desktop + Mobil)
 
 Offene Punkte: Die Gewichte sind ein erster Vorschlag und liegen zentral in `REASON_WEIGHT`.
+
+## Phase 7 – AI-Schicht: Gespräch analysieren, Vorschläge prüfen · abgeschlossen 08.10.2026
+
+- Anbieter-Abstraktion `src/server/ai/` (`AIProvider.generateStructured`), Anthropic-Adapter (strukturierte Ausgabe per erzwungenem Tool-Aufruf, Zod-Validierung), Modell je Aufgabe über `AI_MODEL_*`
+- Ohne `ANTHROPIC_API_KEY` (oder bei `aiLevel` < 2) zeigt die App „AI ist noch nicht eingerichtet …“ statt eines Knopfes; alles bleibt manuell nutzbar
+- „Gespräch analysieren“ im Discovery-Arbeitsbereich: offene Eingaben werden zuerst gespeichert, dann gehen nur die eigenen Notizen, die Kernfrage-Antwort und ein Diktat an das Modell (klar als Daten abgegrenzt)
+- Der Server prüft das Ergebnis:
+  - Zitate müssen im Text vorkommen, sonst „unsicher“ und „Zitat nicht gefunden“
+  - Antworten müssen zum Fragetyp passen
+  - Termine in der Vergangenheit werden entfernt
+  - Unbekannte Fragen werden verworfen (mit Hinweis)
+  - Mehr als 0 Evidence-Punkte ohne belegtes Zitat sind „unsicher“
+- Ergebnis wird nur als `ai_action_proposal` gespeichert. Prüfbildschirm „Ich habe folgende Informationen erkannt.“ mit [Alles übernehmen] [Bearbeiten] [Verwerfen]; unter „Bearbeiten“ lassen sich Punkte abwählen und ändern
+- Übernehmen läuft in einer Transaktion:
+  - Audit mit `actor = ai` und `proposal_id`
+  - der Vorschlag speichert, wer ihn bestätigt hat, und welche Punkte angenommen, geändert oder abgelehnt wurden
+  - Verlaufseintrag „AI-Vorschlag übernommen: x von y Änderungen … bestätigt durch dich“
+  - Events `AI_PROPOSAL_CREATED/APPLIED/REJECTED`
+  - Der Server lässt keine Änderung an Typ, Frage, Zitat oder Ziel-Chance zu
+- Nächster Schritt: Gibt es eine offene Chance, wird ihr nächster Schritt aktualisiert. Sonst wird eine Chance vorgeschlagen (nur bei belegtem Interesse) oder eine Aufgabe angelegt. Die Wiedervorlage erscheint am Fälligkeitstag im Briefing
+- Testmodus: deterministischer Test-Provider, nur mit `APP_ENV=test` startbar (`npm run dev:e2e`) und in der Oberfläche als „Testmodus, kein echtes Modell“ gekennzeichnet
+- Tests: 22 Unit, 70 DB (neu: Analyse ändert nichts, Auswahl/Bearbeitung, Audit, Manipulationsversuche, Mandantentrennung), 10 E2E (neu: analysieren → bearbeiten → übernehmen → Reload → Aufgabe und Verlauf)
+
+Offene Punkte: Für echten Betrieb fehlt `ANTHROPIC_API_KEY` (von Branko anzulegen). Assistent und freie Befehle folgen in der nächsten Phase.
