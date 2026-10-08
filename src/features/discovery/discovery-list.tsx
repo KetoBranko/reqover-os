@@ -17,7 +17,7 @@ export function DiscoveryList({ items, showCompany = true }: { items: DiscoveryL
               href={d.status === 'in_progress' ? `/discovery/${d.id}/gespraech` : `/discovery/${d.id}`}
               className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-line bg-surface p-4 hover:border-line-strong"
             >
-              <div className="min-w-0 flex-1">
+              <div className="min-w-48 flex-1">
                 <p className="font-medium">{showCompany ? companyName : (contactName ?? 'Discovery-Gespräch')}</p>
                 <p className="mt-0.5 text-[13px] text-muted">
                   {d.conductedAt ? formatDate(d.conductedAt) : 'ohne Datum'}

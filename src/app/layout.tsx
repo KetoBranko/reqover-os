@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   description: 'Das Betriebssystem für Sales Recovery.',
   applicationName: 'ReQover OS',
   robots: { index: false, follow: false },
+  icons: { apple: '/icons/apple-touch-icon.png' },
+  appleWebApp: { capable: true, title: 'ReQover', statusBarStyle: 'black' },
+  formatDetection: { telephone: false },
 }
 
 export const viewport: Viewport = {

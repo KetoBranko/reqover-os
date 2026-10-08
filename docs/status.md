@@ -116,3 +116,13 @@ Offene Punkte: Antworten im echten Betrieb hängen am `ANTHROPIC_API_KEY`; im Te
 - Tests: 22 Unit, 75 DB, 16 E2E (neu: Diktat mit simuliertem Mikrofon im Gesprächsmodus inkl. Reload, Sprachbefehl über die Befehlsleiste, Absicherung des Endpunkts)
 
 Offene Punkte: Die Browser-Spracherkennung ist nur manuell in echten Browsern prüfbar (headless gibt es sie nicht). Für eine Transkription ohne Browser-Hersteller braucht es `STT_PROVIDER=openai` mit Schlüssel.
+
+## Phase 10 – Mobile und installierbare App · abgeschlossen 08.10.2026
+
+- Alle Kernseiten auf Smartphone-Breite (Pixel 7) und Desktop geprüft. Mobil gibt es die untere Leiste mit Heute, Aufgaben, „+“ (Befehlsleiste), Unternehmen und Mehr. Das Mikrofon oben öffnet die Spracheingabe
+- Korrigiert: Discovery-Liste bricht Namen und Kennzeichen auf schmalen Bildschirmen sauber um
+- Installierbar als App („Zum Home-Bildschirm“): Manifest mit deutschem Namen, Icons (auch maskable und Apple), Kurzbefehle Heute, Aufgaben, Assistent und Discovery starten. Bewusst ohne Service Worker und ohne Offline-Modus, weil jede Ansicht aktuelle Daten vom Server braucht
+- Icons kommen aus `public/icons/*.svg`; PNGs erzeugt `node scripts/dev/make-icons.mjs`
+- Tests: 22 Unit, 75 DB, 18 E2E (neu: zehn Kernseiten ohne seitliches Überlaufen auf Desktop und Mobil, Manifest und Icons erreichbar)
+
+Offene Punkte: Datumsfelder zeigen das Format des Geräts (auf deutschen Geräten TT.MM.JJJJ). Einstellungen sind noch „Demnächst“ und folgen in Phase 11.
