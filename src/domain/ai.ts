@@ -291,8 +291,8 @@ export function buildActions(x: ExtractionResult, ctx: BuildContext): BuildResul
       nextStep: x.nextStep?.text.trim() ?? null,
       nextStepDate: nextDate,
     })
-  } else if (x.nextStep) {
-    // No opportunity to attach it to: keep the agreed next step as a task.
+  } else if (x.nextStep && !x.tasks.some((t) => t.quote && t.quote === x.nextStep!.quote)) {
+    // No opportunity to attach it to: keep the agreed next step as a task, unless a task from the same sentence covers it.
     actions.push({ ...meta(x.nextStep.quote, x.nextStep.certainty), type: 'task.create', title: x.nextStep.text.trim(), dueDate: nextDate, context: 'Vereinbarter nächster Schritt aus dem Gespräch' })
   }
   return { actions, dropped }

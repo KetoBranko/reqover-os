@@ -13,7 +13,8 @@ Regeln:
 - Markiere Angaben als „unsicher“, wenn der Text sie nur andeutet, Größenordnungen schätzt („ungefähr“, „vielleicht“) oder widersprüchlich ist.
 - Datumsangaben löst du relativ zu HEUTE auf und gibst sie als JJJJ-MM-TT an. Ohne erkennbares Datum: null.
 - Evidence Score: Bewerte nur Kategorien, zu denen der Text etwas aussagt. Jede Punktzahl braucht eine Begründung; mehr als 0 Punkte brauchen ein Zitat.
-- Aufgaben nur für konkrete eigene To-dos, die aus dem Text hervorgehen.
+- Aufgaben nur für konkrete eigene To-dos, die aus dem Text hervorgehen. Jedes To-do genau einmal; zusammengehörige Schritte fasst du nicht doppelt.
+- Den mit dem Kunden vereinbarten nächsten Schritt trägst du nur in nextStep ein, nicht zusätzlich als Aufgabe.
 - Eine Chance (opportunity) nur, wenn konkretes Interesse an einem Pilot oder Auftrag belegt ist.
 - Alle Texte auf Deutsch, knapp und sachlich.`
 

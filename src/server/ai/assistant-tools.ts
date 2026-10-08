@@ -31,7 +31,7 @@ export const ASSISTANT_TOOLS = {
     schema: z.object({ begriff: z.string().min(2).max(100) }),
   },
   unternehmen_kontext: {
-    description: 'Alles zu einem Unternehmen: Fakten, Hypothesen, Kontakte, Chancen, Aufgaben, letzte Aktivitäten, letztes Discovery-Gespräch.',
+    description: 'Alles zu einem Unternehmen: Fakten, Hypothesen, Kontakte, Chancen, Aufgaben, letzte Aktivitäten, letztes abgeschlossenes Discovery-Gespräch und Zahl der noch offenen.',
     schema: z.object({ unternehmenId: z.uuid() }),
   },
   kontakt_verlauf: {
@@ -169,6 +169,7 @@ export async function runTool(ctx: RequestContext, name: string, rawInput: unkno
           letztesDiscovery: x
             ? { abgeschlossen: x.completedAt ? formatDateTime(x.completedAt) : null, zusammenfassung: x.summary, hauptschmerz: x.mainPain, kernfrage: x.coreQuestionAnswer, einwaende: x.objections, evidence: x.rated ? `${x.points}/20 (${x.rated} von 10 bewertet)` : null }
             : null,
+          offeneDiscoveryGespraeche: prep.openDiscoveries,
           prioritaet: prep.priority ? explain(prep.priority) : null,
         },
       }

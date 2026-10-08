@@ -57,6 +57,8 @@ describe('AI-Extraktion → Vorschläge', () => {
     expect(buildActions(x, ctx).actions[0]).toMatchObject({ type: 'task.create', title: 'Pilot abstimmen' })
     const withOpp = { ...x, opportunity: { title: 'Pilot', value: 'ca. 2.800 €', quote: null, certainty: 'unsicher' as const } }
     expect(buildActions(withOpp, ctx).actions[0]).toMatchObject({ type: 'opportunity.create', valueCents: 280000, nextStep: 'Pilot abstimmen' })
+    const covered = { ...empty, nextStep: { text: 'Anrufen und Pilot schicken', date: '2026-10-15', quote: 'Ich soll ihn anrufen', certainty: 'sicher' as const }, tasks: [{ title: 'Anrufen', dueDate: '2026-10-15', context: null, quote: 'Ich soll ihn anrufen', certainty: 'sicher' as const }] }
+    expect(buildActions(covered, ctx).actions.filter((a) => a.type === 'task.create')).toHaveLength(1)
   })
 
   it('Bearbeitungen dürfen Identität, Zitat und Frage nicht ändern', () => {
