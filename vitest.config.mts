@@ -15,6 +15,21 @@ export default defineConfig({
       {
         resolve: { alias },
         test: {
+          name: 'ai',
+          include: ['tests/ai/**/*.test.ts'],
+          environment: 'node',
+          // Real model; the key comes from the environment, everything else is a placeholder.
+          env: {
+            AI_PROVIDER: 'anthropic',
+            DATABASE_URL: 'postgres://unused@127.0.0.1:1/unused',
+            NEXT_PUBLIC_SUPABASE_URL: 'http://127.0.0.1:54321',
+            NEXT_PUBLIC_SUPABASE_ANON_KEY: 'ai-test-anon-key-not-used',
+          },
+        },
+      },
+      {
+        resolve: { alias },
+        test: {
           name: 'db',
           include: ['tests/db/**/*.test.ts'],
           environment: 'node',
