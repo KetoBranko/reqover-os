@@ -25,9 +25,9 @@ start_pg() {
     as_pg "$PGBIN/pg_ctl -D $PGDATA -o '-p $PGPORT -k /tmp' -l $PGDATA/log.txt start" >/dev/null
     sleep 1
   fi
-  psql_admin -d postgres -tc "select 1 from pg_database where datname='reqover'" | grep -q 1 \
-    || psql_admin -d postgres -c "create database reqover"
-  psql_admin -d reqover -f "$ROOT/db/local/bootstrap.sql"
+  psql_admin -d postgres -tc "select 1 from pg_database where datname='prorendo'" | grep -q 1 \
+    || psql_admin -d postgres -c "create database prorendo"
+  psql_admin -d prorendo -f "$ROOT/db/local/bootstrap.sql"
 }
 
 start_gotrue() {
@@ -35,7 +35,7 @@ start_gotrue() {
   set -a; source "$ROOT/.env.local"; set +a
   (cd "$(dirname "$GOTRUE_MIGRATIONS")" && \
     GOTRUE_DB_DRIVER=postgres \
-    DATABASE_URL="postgres://supabase_auth_admin:local-auth-admin@127.0.0.1:$PGPORT/reqover" \
+    DATABASE_URL="postgres://supabase_auth_admin:local-auth-admin@127.0.0.1:$PGPORT/prorendo" \
     GOTRUE_DB_MIGRATIONS_PATH="$GOTRUE_MIGRATIONS" \
     GOTRUE_JWT_SECRET="$LOCAL_JWT_SECRET" GOTRUE_JWT_EXP=3600 GOTRUE_JWT_AUD=authenticated \
     GOTRUE_JWT_ADMIN_ROLES=service_role \
@@ -67,19 +67,19 @@ case "${1:-start}" in
   stop) stop_all ;;
   reset)
     start_pg
-    psql_admin -d postgres -c "select pg_terminate_backend(pid) from pg_stat_activity where datname='reqover' and pid <> pg_backend_pid()" >/dev/null
+    psql_admin -d postgres -c "select pg_terminate_backend(pid) from pg_stat_activity where datname='prorendo' and pid <> pg_backend_pid()" >/dev/null
     [ -f "$RUN_DIR/gotrue.pid" ] && kill "$(cat "$RUN_DIR/gotrue.pid")" 2>/dev/null || true; rm -f "$RUN_DIR/gotrue.pid"
-    psql_admin -d postgres -c "drop database if exists reqover" -c "create database reqover"
+    psql_admin -d postgres -c "drop database if exists prorendo" -c "create database prorendo"
     start_pg; start_gotrue; start_gateway ;;
   test-db)
     # Fresh database for automated tests: Supabase roles, auth schema, app migrations.
     start_pg
-    psql_admin -d postgres -c "drop database if exists reqover_test with (force)" -c "create database reqover_test"
-    sed 's/on database reqover /on database reqover_test /' "$ROOT/db/local/bootstrap.sql" | psql_admin -d reqover_test -f -
+    psql_admin -d postgres -c "drop database if exists prorendo_test with (force)" -c "create database prorendo_test"
+    sed 's/on database prorendo /on database prorendo_test /' "$ROOT/db/local/bootstrap.sql" | psql_admin -d prorendo_test -f -
     (cd "$(dirname "$GOTRUE_MIGRATIONS")" && GOTRUE_DB_DRIVER=postgres \
-      DATABASE_URL="postgres://supabase_auth_admin:local-auth-admin@127.0.0.1:$PGPORT/reqover_test" \
+      DATABASE_URL="postgres://supabase_auth_admin:local-auth-admin@127.0.0.1:$PGPORT/prorendo_test" \
       GOTRUE_DB_MIGRATIONS_PATH="$GOTRUE_MIGRATIONS" GOTRUE_JWT_SECRET=test-secret-not-used API_EXTERNAL_URL=http://localhost \
       GOTRUE_SITE_URL=http://localhost "$GOTRUE_BIN" migrate >/dev/null 2>&1)
-    MIGRATION_DATABASE_URL="postgres://postgres@127.0.0.1:$PGPORT/reqover_test" node "$ROOT/scripts/migrate.mjs" ;;
+    MIGRATION_DATABASE_URL="postgres://postgres@127.0.0.1:$PGPORT/prorendo_test" node "$ROOT/scripts/migrate.mjs" ;;
   *) echo "usage: $0 start|stop|reset|test-db"; exit 1 ;;
 esac

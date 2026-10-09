@@ -56,7 +56,7 @@ async function Review({ id, proposalId }: { id: string; proposalId: string }) {
         <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-accent">Gesprächsauswertung</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight">Ich habe folgende Informationen erkannt.</h1>
         <p className="mt-1.5 text-sm text-muted">
-          {actions.length} Vorschläge{uncertain ? `, davon ${uncertain} unsicher` : ''} · vorgeschlagen durch ReQover AI ({model}) · {formatDateTime(proposal.createdAt)}
+          {actions.length} Vorschläge{uncertain ? `, davon ${uncertain} unsicher` : ''} · vorgeschlagen durch ProRendo AI ({model}) · {formatDateTime(proposal.createdAt)}
         </p>
       </header>
 

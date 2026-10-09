@@ -19,8 +19,8 @@ test('Assistent: Frage aus Daten beantworten, Aufgabe aus der Befehlsleiste vors
 
   // Free text in the command bar goes to the assistant; the change is only proposed.
   await page.keyboard.press('Control+k')
-  await page.getByPlaceholder('Suchen, Aktion wählen oder ReQover fragen …').fill(`Lege eine Aufgabe an: ${title} für morgen`)
-  await page.getByRole('option', { name: /ReQover fragen/ }).click()
+  await page.getByPlaceholder('Suchen, Aktion wählen oder ProRendo fragen …').fill(`Lege eine Aufgabe an: ${title} für morgen`)
+  await page.getByRole('option', { name: /ProRendo fragen/ }).click()
   const card = page.getByRole('region', { name: 'Vorgeschlagene Änderungen' }).filter({ hasText: title })
   await expect(card.getByText('Ich würde folgende Änderungen durchführen:')).toBeVisible()
   await expect(page).toHaveURL(/\/assistent$/)

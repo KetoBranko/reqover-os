@@ -37,8 +37,8 @@ export default defineConfig({
           env: {
             APP_ENV: 'test',
             AI_PROVIDER: 'fake',
-            DATABASE_URL: 'postgres://app_server:local-app-server@127.0.0.1:54322/reqover_test',
-            TEST_ADMIN_DATABASE_URL: 'postgres://postgres@127.0.0.1:54322/reqover_test',
+            DATABASE_URL: 'postgres://app_server:local-app-server@127.0.0.1:54322/prorendo_test',
+            TEST_ADMIN_DATABASE_URL: 'postgres://postgres@127.0.0.1:54322/prorendo_test',
             NEXT_PUBLIC_SUPABASE_URL: 'http://127.0.0.1:54321',
             NEXT_PUBLIC_SUPABASE_ANON_KEY: 'test-anon-key-not-used-in-db-tests',
           },

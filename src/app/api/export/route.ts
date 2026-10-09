@@ -14,7 +14,7 @@ export async function GET() {
     return new NextResponse(JSON.stringify(data, null, 2), {
       headers: {
         'content-type': 'application/json; charset=utf-8',
-        'content-disposition': `attachment; filename="reqover-export-${berlinDay()}.json"`,
+        'content-disposition': `attachment; filename="prorendo-export-${berlinDay()}.json"`,
         'cache-control': 'no-store',
       },
     })

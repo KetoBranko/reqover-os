@@ -7,7 +7,7 @@ export default function LoginPage() {
   return (
     <>
       <h1 className="text-2xl font-semibold tracking-tight">Willkommen zurück.</h1>
-      <p className="mt-2 text-sm text-muted">Melde dich mit deinem ReQover-Konto an.</p>
+      <p className="mt-2 text-sm text-muted">Melde dich mit deinem ProRendo-Konto an.</p>
       <LoginForm />
     </>
   )

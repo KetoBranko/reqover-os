@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* ReQover design tokens. Dark is primary; light is prepared via data-theme. */
+/* ProRendo design tokens. Dark is primary; light is prepared via data-theme. */
 :root {
   --bg: #0d0f13;
   --surface: #14171d;

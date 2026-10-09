@@ -320,7 +320,7 @@ export async function applyProposal(ctx: RequestContext, decision: ProposalDecis
           {
             type: 'ai_action',
             title: `AI-Vorschlag übernommen: ${accepted.length} von ${stored.length} Änderungen`,
-            body: [...counts].map(([label, n]) => `✓ ${label}${n > 1 ? ` (${n})` : ''}`).join('\n') + '\nVorgeschlagen durch ReQover AI, bestätigt durch dich.',
+            body: [...counts].map(([label, n]) => `✓ ${label}${n > 1 ? ` (${n})` : ''}`).join('\n') + '\nVorgeschlagen durch ProRendo AI, bestätigt durch dich.',
             companyId: d?.companyId ?? p.companyId,
             contactId: d?.contactId ?? null,
             discoveryId: d?.id ?? null,

@@ -34,14 +34,14 @@ test('Diktat: Notiz im Gesprächsmodus und Sprachbefehl in der Befehlsleiste', a
   await page.reload()
   await expect(page.getByLabel('Notizen', { exact: true })).toHaveValue(`Erste eigene Notiz.\n${DICTATED}`)
 
-  // Global voice entry: the command bar opens listening; the text becomes a question for ReQover.
+  // Global voice entry: the command bar opens listening; the text becomes a question for ProRendo.
   await page.goto('/')
   await page.getByRole('button', { name: 'Spracheingabe' }).click()
   await expect(page.getByRole('status').filter({ hasText: 'Mikrofon an' })).toBeVisible()
   await page.waitForTimeout(600)
   await page.getByRole('button', { name: 'Diktat beenden' }).click()
   await expect(page.getByPlaceholder(/Suchen, Aktion wählen/)).toHaveValue(DICTATED)
-  await expect(page.getByRole('option', { name: /ReQover fragen/ })).toBeVisible()
+  await expect(page.getByRole('option', { name: /ProRendo fragen/ })).toBeVisible()
   await page.keyboard.press('Escape')
 
   await page.goto(companyUrl)

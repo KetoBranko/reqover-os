@@ -28,6 +28,6 @@ $$;
 grant anon, authenticated to app_server;
 
 create schema if not exists auth authorization supabase_auth_admin;
-grant create on database reqover to supabase_auth_admin;
+grant create on database prorendo to supabase_auth_admin;
 alter role supabase_auth_admin set search_path = 'auth';
 grant usage on schema auth to authenticated, anon, service_role, app_server;

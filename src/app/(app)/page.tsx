@@ -53,7 +53,7 @@ async function Overview() {
         <EmptyState
           icon={Building2}
           title="Noch keine Zielunternehmen"
-          description="Sobald du Unternehmen, Gespräche und Aufgaben erfasst, priorisiert ReQover hier deinen Tag."
+          description="Sobald du Unternehmen, Gespräche und Aufgaben erfasst, priorisiert ProRendo hier deinen Tag."
           actions={
             <Link href="/unternehmen?neu=1" className={buttonVariants({ variant: 'primary' })}>
               Erstes Unternehmen anlegen

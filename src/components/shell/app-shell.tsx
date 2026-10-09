@@ -29,8 +29,8 @@ export function AppShell({ userSlot, bannerSlot, topbarSlot, mobileCenterSlot, c
     <div className="min-h-dvh lg:grid lg:grid-cols-[240px_1fr]">
       <aside className="sticky top-0 hidden h-dvh flex-col border-r border-line bg-surface/40 lg:flex">
         <div className="flex h-14 items-center gap-2.5 px-5">
-          <div className="grid size-7 place-items-center rounded-md bg-accent-soft text-[13px] font-bold text-accent">R</div>
-          <span className="text-sm font-semibold tracking-tight">ReQover OS</span>
+          <div className="grid size-7 place-items-center rounded-md bg-accent-soft text-[13px] font-bold text-accent">P</div>
+          <span className="text-sm font-semibold tracking-tight">ProRendo OS</span>
         </div>
         <nav aria-label="Hauptnavigation" className="flex flex-1 flex-col gap-0.5 px-3 py-2">
           <Suspense fallback={<SidebarLinks pathname={null} />}>
@@ -43,7 +43,7 @@ export function AppShell({ userSlot, bannerSlot, topbarSlot, mobileCenterSlot, c
       <div className="flex min-w-0 flex-col">
         <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-line bg-bg/85 px-4 backdrop-blur lg:px-8">
           <div className="flex items-center gap-2 lg:hidden">
-            <div className="grid size-7 place-items-center rounded-md bg-accent-soft text-[13px] font-bold text-accent">R</div>
+            <div className="grid size-7 place-items-center rounded-md bg-accent-soft text-[13px] font-bold text-accent">P</div>
           </div>
           <div className="flex min-w-0 flex-1 items-center gap-2">{topbarSlot}</div>
         </header>

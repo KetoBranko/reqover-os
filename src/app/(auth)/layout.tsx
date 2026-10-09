@@ -7,8 +7,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       />
       <div className="relative w-full max-w-sm">
         <div className="mb-8 flex items-center gap-2.5">
-          <div className="grid size-8 place-items-center rounded-lg bg-accent-soft text-sm font-bold text-accent">R</div>
-          <span className="text-[15px] font-semibold tracking-tight">ReQover OS</span>
+          <div className="grid size-8 place-items-center rounded-lg bg-accent-soft text-sm font-bold text-accent">P</div>
+          <span className="text-[15px] font-semibold tracking-tight">ProRendo OS</span>
         </div>
         {children}
       </div>

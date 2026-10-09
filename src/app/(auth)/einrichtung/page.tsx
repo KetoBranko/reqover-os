@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: 'Einrichtung' }
 export default function SetupPage() {
   return (
     <>
-      <h1 className="text-2xl font-semibold tracking-tight">ReQover einrichten</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">ProRendo einrichten</h1>
       <p className="mt-2 text-sm text-muted">
         Lege deine Organisation an. Pipeline-Stufen und der Discovery-Leitfaden werden automatisch vorbereitet.
       </p>

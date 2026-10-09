@@ -48,7 +48,7 @@ test('Gespräch analysieren → Prüfbildschirm → Auswahl bearbeiten und über
   await expect(page.getByRole('tab', { name: 'Evidence Score · 2/20' })).toBeVisible()
   await expect(page.getByRole('tab', { name: /Fragen · 1\// })).toBeVisible()
 
-  // Aufgabe mit Herkunft AI und Verlaufseintrag „vorgeschlagen durch ReQover AI, bestätigt durch dich“.
+  // Aufgabe mit Herkunft AI und Verlaufseintrag „vorgeschlagen durch ProRendo AI, bestätigt durch dich“.
   await page.goto('/aufgaben')
   await expect(page.getByText(`Thomas anrufen ${company}`).filter({ visible: true })).toBeVisible()
   await page.goto(companyUrl)

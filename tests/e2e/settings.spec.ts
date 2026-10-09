@@ -28,7 +28,7 @@ test('Einstellungen: Pilotangebot ändern, Änderungsprotokoll, Export', async (
   const download = page.waitForEvent('download')
   await page.getByRole('link', { name: /Alle Daten exportieren/ }).click()
   const file = await download
-  expect(file.suggestedFilename()).toMatch(/^reqover-export-\d{4}-\d{2}-\d{2}\.json$/)
+  expect(file.suggestedFilename()).toMatch(/^prorendo-export-\d{4}-\d{2}-\d{2}\.json$/)
 
   await page.getByRole('link', { name: 'Änderungsprotokoll' }).click()
   await page.waitForURL(/\/einstellungen\/protokoll$/)

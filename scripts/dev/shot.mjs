@@ -9,7 +9,7 @@ for (const [name, opts] of [['desktop', { viewport: { width: 1440, height: 900 }
   page.on('pageerror', (e) => console.log('PAGEERROR', e.message))
   page.on('console', (m) => m.type() === 'error' && console.log('CONSOLE', m.text()))
   await page.goto(base + '/anmelden')
-  await page.fill('#email', process.env.E2E_EMAIL ?? 'branko@reqover.test')
+  await page.fill('#email', process.env.E2E_EMAIL ?? 'branko@prorendo.test')
   await page.fill('#password', process.env.E2E_PASSWORD ?? 'Test-Passwort-123')
   await page.click('button[type=submit]')
   await page.waitForURL((u) => !u.pathname.startsWith('/anmelden'), { timeout: 20000 })

@@ -98,7 +98,7 @@ export function CompanyFormDialog({
           <Field label="Quelle" htmlFor="c-source" error={err('source')} hint="Woher kennst du das Unternehmen?">
             <Input id="c-source" name="source" defaultValue={initial?.source ?? ''} placeholder="z. B. Messe, Empfehlung" />
           </Field>
-          <Field label="ReQover Fit (0–100)" htmlFor="c-fit" error={err('fitScore')}>
+          <Field label="ProRendo Fit (0–100)" htmlFor="c-fit" error={err('fitScore')}>
             <Input id="c-fit" name="fitScore" type="number" min={0} max={100} defaultValue={initial?.fitScore ?? ''} inputMode="numeric" />
           </Field>
 

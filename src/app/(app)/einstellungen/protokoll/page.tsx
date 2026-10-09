@@ -49,7 +49,7 @@ async function AuditContent({ table, actor, before }: { table?: string; actor?: 
           Einstellungen
         </Link>
       </nav>
-      <PageHeader title="Änderungsprotokoll" description="Wer hat wann was geändert, Mensch oder ReQover AI, und wer hat bestätigt." />
+      <PageHeader title="Änderungsprotokoll" description="Wer hat wann was geändert, Mensch oder ProRendo AI, und wer hat bestätigt." />
       <div className="mb-3 flex flex-wrap gap-2" role="group" aria-label="Wer">
         <Link href={href({ bereich: t })} className={chip(!a)}>
           Alle
@@ -58,7 +58,7 @@ async function AuditContent({ table, actor, before }: { table?: string; actor?: 
           Menschen
         </Link>
         <Link href={href({ bereich: t, wer: 'ai' })} className={chip(a === 'ai')}>
-          ReQover AI
+          ProRendo AI
         </Link>
       </div>
       <div className="mb-5 flex gap-2 overflow-x-auto pb-1" role="group" aria-label="Bereich">
@@ -87,11 +87,11 @@ async function AuditContent({ table, actor, before }: { table?: string; actor?: 
               </div>
               <p className="mt-1 flex flex-wrap items-center gap-1.5 text-[13px] text-muted">
                 {e.table === 'ai_action_proposals' ? (
-                  <span>{e.action === 'insert' ? `vorgeschlagen durch ReQover AI${e.actorName ? ` auf Anfrage von ${e.actorName}` : ''}` : `entschieden durch ${e.confirmedBy ?? e.actorName ?? 'unbekannt'}`}</span>
+                  <span>{e.action === 'insert' ? `vorgeschlagen durch ProRendo AI${e.actorName ? ` auf Anfrage von ${e.actorName}` : ''}` : `entschieden durch ${e.confirmedBy ?? e.actorName ?? 'unbekannt'}`}</span>
                 ) : e.actor === 'ai' ? (
                   <>
-                    <Badge tone="accent">ReQover AI</Badge>
-                    <span>vorgeschlagen durch ReQover AI{e.confirmedBy || e.actorName ? `, bestätigt durch ${e.confirmedBy ?? e.actorName}` : ''}</span>
+                    <Badge tone="accent">ProRendo AI</Badge>
+                    <span>vorgeschlagen durch ProRendo AI{e.confirmedBy || e.actorName ? `, bestätigt durch ${e.confirmedBy ?? e.actorName}` : ''}</span>
                   </>
                 ) : e.actor === 'system' ? (
                   <span>System</span>

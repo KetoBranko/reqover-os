@@ -6,13 +6,13 @@ import * as schema from './schema'
 
 type Db = PostgresJsDatabase<typeof schema>
 
-const globalForDb = globalThis as unknown as { reqoverSql?: postgres.Sql; reqoverDb?: Db }
+const globalForDb = globalThis as unknown as { prorendoSql?: postgres.Sql; prorendoDb?: Db }
 
 // One pool per server process (kept across dev hot reloads).
 // prepare: false keeps us compatible with Supabase's transaction pooler.
 function create(): Db {
   const sql = postgres(env().DATABASE_URL, { max: 10, prepare: false, idle_timeout: 20 })
-  globalForDb.reqoverSql = sql
+  globalForDb.prorendoSql = sql
   return drizzle(sql, { schema })
 }
 
@@ -21,15 +21,15 @@ function create(): Db {
  * context. Use withUserTx() from ./context instead.
  */
 export function rawDb(): Db {
-  globalForDb.reqoverDb ??= create()
-  return globalForDb.reqoverDb
+  globalForDb.prorendoDb ??= create()
+  return globalForDb.prorendoDb
 }
 
 /** Closes the pool (tests and scripts only). */
 export async function closeDb() {
-  await globalForDb.reqoverSql?.end()
-  globalForDb.reqoverDb = undefined
-  globalForDb.reqoverSql = undefined
+  await globalForDb.prorendoSql?.end()
+  globalForDb.prorendoDb = undefined
+  globalForDb.prorendoSql = undefined
 }
 
 export type { Db }

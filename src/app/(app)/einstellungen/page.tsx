@@ -27,7 +27,7 @@ export default function SettingsPage() {
 
 const VOICE_TEXT = {
   browser: 'Spracherkennung des Browsers (Chrome, Edge, Safari). Chrome und Edge senden das Audio dafür an den Dienst des Browser-Herstellers.',
-  server: 'Umwandlung über den eingerichteten Transkriptionsdienst. ReQover speichert kein Audio, nur den Text, den du übernimmst.',
+  server: 'Umwandlung über den eingerichteten Transkriptionsdienst. ProRendo speichert kein Audio, nur den Text, den du übernimmst.',
 } as const
 
 async function SettingsContent() {
@@ -117,7 +117,7 @@ async function SettingsContent() {
               {admin && data.demoCompanies > 0 && <RemoveDemoButton count={data.demoCompanies} />}
             </div>
             <p className="text-[13px] text-muted">
-              Das Änderungsprotokoll zeigt, wer wann was geändert hat, ob ein Mensch oder ReQover AI, und wer einen AI-Vorschlag bestätigt hat. Einzelne Unternehmen löschst du auf ihrer Seite; Kontakte, Gespräche und Aufgaben werden dabei mit gelöscht.
+              Das Änderungsprotokoll zeigt, wer wann was geändert hat, ob ein Mensch oder ProRendo AI, und wer einen AI-Vorschlag bestätigt hat. Einzelne Unternehmen löschst du auf ihrer Seite; Kontakte, Gespräche und Aufgaben werden dabei mit gelöscht.
             </p>
             {role === 'owner' && (
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-danger/30 bg-danger-soft px-4 py-3">

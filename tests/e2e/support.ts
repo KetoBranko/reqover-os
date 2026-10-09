@@ -1,6 +1,6 @@
 import { expect, type Page } from '@playwright/test'
 
-export const E2E_EMAIL = process.env.E2E_EMAIL ?? 'e2e@reqover.test'
+export const E2E_EMAIL = process.env.E2E_EMAIL ?? 'e2e@prorendo.test'
 export const E2E_PASSWORD = process.env.E2E_PASSWORD ?? 'E2E-Passwort-123'
 
 export async function login(page: Page) {

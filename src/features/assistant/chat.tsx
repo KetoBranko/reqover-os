@@ -120,7 +120,7 @@ export function AssistantChat({ conversationId, items, initialQuestion }: { conv
             }
           }}
           rows={1}
-          placeholder="Frag ReQover …"
+          placeholder="Frag ProRendo …"
           aria-label="Frage an den Assistenten"
           className="max-h-40 min-h-10 flex-1 resize-none border-0 bg-transparent focus-visible:ring-0"
         />

@@ -1,7 +1,7 @@
 // Seeds clearly marked, fictional demo data into one organization (development only).
 // Every row has is_demo = true, so the UI shows a permanent demo banner and the data
 // can be removed again with --remove. Company names are invented; none is a real firm.
-// Usage: npm run db:seed:demo -- --email branko@reqover.test [--remove]
+// Usage: npm run db:seed:demo -- --email branko@prorendo.test [--remove]
 import postgres from 'postgres'
 import { parseArgs } from 'node:util'
 

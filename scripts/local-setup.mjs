@@ -26,8 +26,8 @@ writeFileSync(
 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=${anon}
 SUPABASE_SERVICE_ROLE_KEY=${service}
-DATABASE_URL=postgres://app_server:local-app-server@127.0.0.1:54322/reqover
-MIGRATION_DATABASE_URL=postgres://postgres@127.0.0.1:54322/reqover
+DATABASE_URL=postgres://app_server:local-app-server@127.0.0.1:54322/prorendo
+MIGRATION_DATABASE_URL=postgres://postgres@127.0.0.1:54322/prorendo
 AI_PROVIDER=none
 STT_PROVIDER=browser
 LOCAL_JWT_SECRET=${secret}
