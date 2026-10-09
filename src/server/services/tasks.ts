@@ -50,7 +50,7 @@ export async function createTask(tx: Tx, ctx: RequestContext, input: TaskInput, 
       organizationId: ctx.organizationId,
       createdBy: ctx.userId,
       assigneeId: ctx.userId,
-      origin: opts.actor === 'ai' ? 'ai' : 'human',
+      origin: opts.actor ?? 'human',
     })
     .returning()
   await emitEvent(tx, ctx, 'TASK_CREATED', { taskId: row!.id, companyId }, opts)

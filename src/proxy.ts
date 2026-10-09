@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const PUBLIC_PATHS = ['/anmelden', '/auth']
+const PUBLIC_PATHS = ['/anmelden', '/auth', '/api/anfrage']
 
 // Keeps the Supabase session cookie fresh and sends signed-out visitors to the
 // login page. This is a convenience layer only: every page and action checks
