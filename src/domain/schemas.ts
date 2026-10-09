@@ -207,3 +207,18 @@ export const signalInput = z.object({
   value: z.enum(['yes', 'no', 'unclear']),
 })
 export type SignalInput = z.infer<typeof signalInput>
+
+// Contact form on the public landing page (prorendo.de). Unauthenticated input,
+// so every field is bounded; `website` is the honeypot and must stay empty.
+export const websiteInquiryInput = z.object({
+  name: trimmed(160).min(1),
+  company: trimmed(200).min(1),
+  email: z.string().trim().max(254).pipe(z.email()),
+  phone: optionalText(60),
+  topic: optionalText(160),
+  message: optionalText(5000),
+  calculator: optionalText(2000),
+  website: z.string().max(500).optional(),
+  source: optionalText(500),
+})
+export type WebsiteInquiryInput = z.infer<typeof websiteInquiryInput>

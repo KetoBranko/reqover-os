@@ -11,6 +11,14 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <span className="text-[15px] font-semibold tracking-tight">ProRendo OS</span>
         </div>
         {children}
+        <nav className="mt-10 flex gap-4 text-xs text-muted">
+          <a href="https://prorendo.de/impressum" className="hover:text-fg">
+            Impressum
+          </a>
+          <a href="https://prorendo.de/datenschutz" className="hover:text-fg">
+            Datenschutz
+          </a>
+        </nav>
       </div>
     </main>
   )

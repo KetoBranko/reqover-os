@@ -21,6 +21,7 @@ Diese Seite beschreibt, wie ProRendo OS gebaut ist, nicht welche Zertifizierunge
 ## Endpunkte
 
 - `POST /api/sprache` nimmt nur Anfragen von derselben Herkunft und mit Sitzung an. Erlaubt sind nur Audio bis 15 MB und höchstens 20 Anfragen pro Minute und Nutzer. Das Audio wird nicht gespeichert.
+- `POST /api/anfrage` ist ohne Sitzung erreichbar, weil das Kontaktformular der Landingpage (prorendo.de) dorthin sendet. Angenommen werden nur Anfragen von den erlaubten Herkünften (`LEAD_ALLOWED_ORIGINS`), mit begrenzten Feldlängen, Honeypot und höchstens 5 Anfragen pro 10 Minuten und IP (je Server-Instanz). Den Empfänger (Organisation und Inhaber) ermittelt `private.inquiry_target`, das nur ohne angemeldeten Nutzer antwortet; geschrieben wird danach als Inhaber über RLS mit Akteur `system`.
 - `GET /api/export` ist nur für Inhaber und Admins und wird nicht zwischengespeichert (`no-store`).
 - AI-Anfragen (Assistent, Gesprächsanalyse) sind auf 20 pro Minute und Nutzer begrenzt. Die Begrenzung gilt je Server-Instanz, ist also ein Schutz gegen Fehlbedienung und Schleifen, kein Kontingent.
 - Gegen Brute-Force bei der Anmeldung schützt Supabase Auth mit eigenen Limits.
