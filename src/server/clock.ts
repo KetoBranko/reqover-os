@@ -2,7 +2,7 @@ import 'server-only'
 import { cookies } from 'next/headers'
 import { env } from '@/server/env'
 
-export const TEST_CLOCK_COOKIE = 'reqover-testzeit'
+export const TEST_CLOCK_COOKIE = 'prorendo-testzeit'
 
 /**
  * Current time for a request. Only automated tests (APP_ENV=test) may move it,

@@ -51,7 +51,7 @@ async function Proposal({ proposalId }: { proposalId: string }) {
         <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-accent">Vorschlag</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight">Ich würde folgende Änderungen durchführen.</h1>
         <p className="mt-1.5 text-sm text-muted">
-          {actions.length} {actions.length === 1 ? 'Änderung' : 'Änderungen'} · vorgeschlagen durch ReQover AI ({model}) · {formatDateTime(proposal.createdAt)}
+          {actions.length} {actions.length === 1 ? 'Änderung' : 'Änderungen'} · vorgeschlagen durch ProRendo AI ({model}) · {formatDateTime(proposal.createdAt)}
         </p>
       </header>
       {proposal.status !== 'pending' ? (

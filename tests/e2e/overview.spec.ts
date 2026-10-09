@@ -9,7 +9,7 @@ test('Übersicht priorisiert aus echten Daten, erklärt „Warum?“ und führt 
 
   await page.goto('/')
   await expect(page.getByRole('heading', { level: 1, name: /^Guten (Morgen|Tag|Abend)/ })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'ReQover Briefing' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'ProRendo Briefing' })).toBeVisible()
 
   // Unternehmen + Chance mit Wiedervorlage heute anlegen.
   await page.goto('/unternehmen?neu=1')

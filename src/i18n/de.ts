@@ -4,7 +4,7 @@
 
 export const de = {
   app: {
-    name: 'ReQover OS',
+    name: 'ProRendo OS',
     tagline: 'Wir geben dem Vertrieb Chancen zurück.',
     demoBanner: 'Demo-Daten: Diese Einträge sind fiktiv und dienen nur zum Testen.',
   },
@@ -18,7 +18,7 @@ export const de = {
     tasks: 'Aufgaben',
     activities: 'Aktivitäten',
     validation: 'Validierung',
-    assistant: 'ReQover Assistent',
+    assistant: 'ProRendo Assistent',
     settings: 'Einstellungen',
     more: 'Mehr',
     voice: 'Spracheingabe',
@@ -81,7 +81,7 @@ export const de = {
     discovery: 'Discovery',
     website: 'Website',
     research: 'Recherche',
-    ai: 'ReQover AI',
+    ai: 'ProRendo AI',
   },
   decisionRole: {
     decision_maker: 'Entscheider',
@@ -143,7 +143,7 @@ export const de = {
     sales_process: 'B · Vertriebsprozess',
     problem: 'C · Problem',
     core_question: 'D · Kernfrage',
-    reaction: 'E · ReQover-Reaktion',
+    reaction: 'E · ProRendo-Reaktion',
     willingness_to_pay: 'F · Zahlungsbereitschaft',
     buying_process: 'G · Buying Process',
     evidence: 'H · Evidence vs. Interpretation',
@@ -175,7 +175,7 @@ export const de = {
   },
   actor: {
     human: 'Mensch',
-    ai: 'ReQover AI',
+    ai: 'ProRendo AI',
     system: 'System',
   },
   membershipRole: {

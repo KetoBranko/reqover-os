@@ -135,7 +135,7 @@ export async function exportOrganization(ctx: RequestContext, role: Role) {
     const messages = conversations.length ? await tx.select().from(s.aiMessages).where(inArray(s.aiMessages.conversationId, conversations.map((c) => c.id))) : []
     await emitEvent(tx, ctx, 'DATA_EXPORTED', { tables: Object.keys(data).length })
     return {
-      format: 'reqover-export',
+      format: 'prorendo-export',
       version: 1,
       exportiertAm: new Date().toISOString(),
       organisation: { id: org!.id, name: org!.name, einstellungen: parseOrganizationSettings(org!.settings) },

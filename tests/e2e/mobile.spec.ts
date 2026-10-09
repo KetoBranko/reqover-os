@@ -13,7 +13,7 @@ test('Kernseiten ohne seitliches Scrollen, App installierbar', async ({ page, re
   }
 
   const manifest = await (await request.get('/manifest.webmanifest')).json()
-  expect(manifest).toMatchObject({ name: 'ReQover OS', lang: 'de-DE', display: 'standalone', start_url: '/' })
+  expect(manifest).toMatchObject({ name: 'ProRendo OS', lang: 'de-DE', display: 'standalone', start_url: '/' })
   for (const icon of manifest.icons as { src: string }[]) expect((await request.get(icon.src)).status()).toBe(200)
   await expect(page.locator('link[rel="manifest"]')).toHaveCount(1)
 })

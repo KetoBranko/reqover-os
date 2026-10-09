@@ -4,12 +4,12 @@ import type { BriefingLine, PriorityItem } from '@/domain/briefing'
 import { WhyDetails } from './why-details'
 import { cn } from '@/lib/cn'
 
-/** "REQOVER BRIEFING": short, data-derived sentences. Each line links to its source. */
+/** "PRORENDO BRIEFING": short, data-derived sentences. Each line links to its source. */
 export function BriefingCard({ lines, top }: { lines: BriefingLine[]; top: PriorityItem | null }) {
   return (
     <section aria-labelledby="briefing-title" className="rounded-xl border border-line bg-surface p-5 sm:p-6">
       <h2 id="briefing-title" className="text-[12px] font-semibold uppercase tracking-[0.14em] text-accent">
-        ReQover Briefing
+        ProRendo Briefing
       </h2>
       <div className="mt-3 space-y-3 text-[15px] leading-relaxed">
         {lines.map((line, i) => (

@@ -39,11 +39,12 @@ function databaseUrl(): string | undefined {
 export function env(): ServerEnv {
   if (cached) return cached
   // Claude Code cloud environments do not pass ANTHROPIC_API_KEY through to sessions,
-  // so the key may also be stored as REQOVER_ANTHROPIC_API_KEY.
+  // so the key may also be stored as PRORENDO_ANTHROPIC_API_KEY (or the older
+  // REQOVER_ANTHROPIC_API_KEY from before the rename).
   const parsed = schema.safeParse({
     ...process.env,
     DATABASE_URL: databaseUrl(),
-    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY || process.env.REQOVER_ANTHROPIC_API_KEY,
+    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY || process.env.PRORENDO_ANTHROPIC_API_KEY || process.env.REQOVER_ANTHROPIC_API_KEY,
   })
   if (!parsed.success) {
     const fields = parsed.error.issues.map((i) => i.path.join('.')).join(', ')

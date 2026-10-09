@@ -1,5 +1,7 @@
 # Deployment (Vercel + Supabase)
 
+Product name is ProRendo; the hosting projects below still carry the old name `reqover-os` (renaming them changes URLs and is done by the owner, if at all).
+
 - Supabase project `reqover-os` (ref `peqewlbyniyhdwpttshh`, region eu-central-1 / Frankfurt).
 - Vercel project `reqover-os`, connected to this repository; pushes to `main` deploy to production.
 - `npm run vercel-build` applies pending migrations (`scripts/migrate.mjs`) before `next build`, on production deployments only. Preview deployments never touch the database schema.

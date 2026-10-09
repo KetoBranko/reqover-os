@@ -12,7 +12,7 @@ function fail(status: number, message: string) {
 
 /**
  * Transcribes one dictation. The audio is passed to the configured provider
- * and discarded; ReQover stores only the text the user then keeps.
+ * and discarded; ProRendo stores only the text the user then keeps.
  */
 export async function POST(request: NextRequest) {
   const origin = request.headers.get('origin')

@@ -39,9 +39,9 @@ test('Haupt-Flow: Briefing → Unternehmen → Vorbereitung → Gespräch → Di
   await submitDialog(page)
   await expectToast(page, /Aufgabe/)
 
-  // 1–2: ReQover öffnen, das Briefing zeigt die Priorität.
+  // 1–2: ProRendo öffnen, das Briefing zeigt die Priorität.
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: 'ReQover Briefing' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'ProRendo Briefing' })).toBeVisible()
   const item = page.getByRole('listitem', { name: new RegExp(company) })
   await expect(item).toBeVisible()
   await expect(item.getByText(`Gespräch vorbereiten ${company}`).first()).toBeVisible()
@@ -120,13 +120,13 @@ test('Haupt-Flow: Briefing → Unternehmen → Vorbereitung → Gespräch → Di
   // 18: Am nächsten Tag erinnert das Briefing an den nächsten Schritt (heute ist die Aufgabe noch nicht fällig).
   await page.goto('/')
   await expect(page.getByRole('listitem', { name: new RegExp(company) }).getByText(callTask)).toHaveCount(0)
-  await context.addCookies([{ name: 'reqover-testzeit', value: `${berlinDay(1)}T10:00:00Z`, url: baseURL! }])
+  await context.addCookies([{ name: 'prorendo-testzeit', value: `${berlinDay(1)}T10:00:00Z`, url: baseURL! }])
   await page.goto('/')
   const tomorrow = page.getByRole('listitem', { name: new RegExp(company) })
   await expect(tomorrow).toBeVisible()
   await expect(tomorrow.getByText(callTask).first()).toBeVisible()
   await expect(tomorrow.getByRole('list', { name: 'Gründe' })).toContainText('Aufgabe seit gestern überfällig')
-  await context.clearCookies({ name: 'reqover-testzeit' })
+  await context.clearCookies({ name: 'prorendo-testzeit' })
 
   // Aufräumen.
   await page.goto(companyUrl)

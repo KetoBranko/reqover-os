@@ -1,6 +1,6 @@
-# ReQover OS
+# ProRendo OS
 
-Internes Operating System von ReQover: CRM, Discovery und Vertriebssteuerung, später Sales-Recovery-Plattform.
+Internes Operating System von ProRendo: CRM, Discovery und Vertriebssteuerung, später Sales-Recovery-Plattform.
 Architektur und Plan: siehe `docs/architecture.md` und das Phase-0-Dokument (Link dort).
 
 ## Lokale Entwicklung

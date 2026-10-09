@@ -1,4 +1,4 @@
-// Helpers for database tests against the local test database (reqover_test).
+// Helpers for database tests against the local test database (prorendo_test).
 // Users are inserted directly into auth.users with the admin connection; every
 // assertion then runs through the app's real RLS context (withUserTx).
 import postgres from 'postgres'

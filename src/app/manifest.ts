@@ -1,11 +1,11 @@
 import type { MetadataRoute } from 'next'
 
-// Installable app (home screen / dock). No service worker: ReQover needs the
+// Installable app (home screen / dock). No service worker: ProRendo needs the
 // server for every view, so there is no pretend offline mode.
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'ReQover OS',
-    short_name: 'ReQover',
+    name: 'ProRendo OS',
+    short_name: 'ProRendo',
     description: 'Das Betriebssystem für Sales Recovery.',
     lang: 'de-DE',
     dir: 'ltr',
@@ -23,7 +23,7 @@ export default function manifest(): MetadataRoute.Manifest {
     shortcuts: [
       { name: 'Heute', url: '/', icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }] },
       { name: 'Aufgaben', url: '/aufgaben', icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }] },
-      { name: 'ReQover Assistent', url: '/assistent', icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }] },
+      { name: 'ProRendo Assistent', url: '/assistent', icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }] },
       { name: 'Discovery starten', url: '/discovery?neu=1', icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }] },
     ],
   }

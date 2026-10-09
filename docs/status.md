@@ -49,7 +49,7 @@ Offene Punkte: Das Datumsfeld ist das native Browser-Steuerelement und folgt der
 
 ## Phase 6 – Übersicht, Morning Briefing, Validierung · abgeschlossen 08.10.2026
 
-- Übersicht als Command Center: Begrüßung nach Tageszeit, „ReQover Briefing“, „Heute wichtig“, acht Kennzahlen (alle verlinkt)
+- Übersicht als Command Center: Begrüßung nach Tageszeit, „ProRendo Briefing“, „Heute wichtig“, acht Kennzahlen (alle verlinkt)
 - Briefing und Priorisierung sind feste Regeln in `src/domain/briefing.ts` (keine AI). Auslöser: überfällige/heutige Aufgaben und Wiedervorlagen, Chance ohne nächsten Schritt, ≥ 14 Tage ohne Aktivität, abgeschlossenes Discovery ohne Folgeschritt. Verstärker: Bedarf bestätigt, Evidence Score ≥ 14, Preis akzeptiert, Phase Pilot-Chance/Angebot. Verstärker allein machen nichts dringend. Ab 50 Punkten „Hohe Priorität“
 - „Warum?“ an jeder Empfehlung zeigt Begründung, Einzelgewichte und Summe (funktioniert ohne JavaScript)
 - „Seit deinem letzten Besuch“: der Bezugszeitpunkt wird einmal pro Tag (Europe/Berlin) weitergeschoben und bleibt beim Neuladen stabil
@@ -84,7 +84,7 @@ Offene Punkte: Die Gewichte sind ein erster Vorschlag und liegen zentral in `REA
 
 Offene Punkte: Für echten Betrieb fehlt `ANTHROPIC_API_KEY` (von Branko anzulegen). Assistent und freie Befehle folgen in der nächsten Phase.
 
-## Phase 8 – ReQover Assistent und freie Befehle · abgeschlossen 08.10.2026
+## Phase 8 – ProRendo Assistent und freie Befehle · abgeschlossen 08.10.2026
 
 - `/assistent`: Chat, der nur auf Basis der eigenen Daten antwortet; jede Antwort nennt ihre Datenbasis („Datenbasis: Priorisierung“). Fehlen Daten, kommt „Dazu liegen mir noch keine ausreichenden Daten vor.“ Gespräche werden gespeichert („Neues Gespräch“ beginnt ein frisches)
 - Lesen und Schreiben sind getrennt:
@@ -92,7 +92,7 @@ Offene Punkte: Für echten Betrieb fehlt `ANTHROPIC_API_KEY` (von Branko anzuleg
   - Vorschlags-Werkzeuge: Aufgabe, Notiz, Phasenwechsel. Sie schreiben nichts, sondern sammeln einen `ai_action_proposal` pro Antwort
 - Im Chat erscheint „Ich würde folgende Änderungen durchführen: …“ mit [Übernehmen] [Bearbeiten] [Verwerfen]. „Bearbeiten“ öffnet `/vorschlaege/[id]` (Auswahl und Felder änderbar). Übernehmen nutzt denselben transaktionalen Weg wie Phase 7 (Audit `actor = ai`, Verlaufseintrag, Events)
 - „Gewonnen“ ohne dokumentierten Auftrag: Der Assistent weist darauf hin; übernommen wird nur mit Auftragsdatum oder dem ausdrücklichen Haken „Trotzdem als gewonnen markieren“. „Verloren“ verlangt einen Grund
-- Befehlsleiste: Ab drei Zeichen gibt es „ReQover fragen: „…““; Suchtreffer und Schnellaktionen haben Vorrang, freier Text ohne Treffer geht mit Enter an den Assistenten
+- Befehlsleiste: Ab drei Zeichen gibt es „ProRendo fragen: „…““; Suchtreffer und Schnellaktionen haben Vorrang, freier Text ohne Treffer geht mit Enter an den Assistenten
 - Ohne eingerichtete AI zeigt `/assistent` ehrlich „Assistent nicht verfügbar“ mit Grund
 - Tests: 22 Unit, 75 DB (neu: Mandantentrennung der Werkzeuge und Gespräche, Vorschlag statt Schreiben, Bestätigung legt Aufgabe an, „Gewonnen“-Regel), 12 E2E (neu: Frage beantworten → Aufgabe über die Befehlsleiste vorschlagen → vorher nicht vorhanden → Übernehmen → Aufgabe vorhanden)
 
@@ -111,7 +111,7 @@ Offene Punkte: Antworten im echten Betrieb hängen am `ANTHROPIC_API_KEY`; im Te
   - Gesprächsmodus und Discovery-Arbeitsbereich: „Notiz diktieren“ hängt den Text an die Notizen an und speichert sofort
   - Notiz oder Aktivität erfassen, auch die Schnellnotiz nach „Erledigt“
   - Assistent: Frage diktieren, vor dem Senden prüfbar
-  - Global: Mikrofon neben „Was möchtest du tun?“ öffnet die Befehlsleiste und hört sofort zu. Der Text erscheint als Suche oder „ReQover fragen: …“
+  - Global: Mikrofon neben „Was möchtest du tun?“ öffnet die Befehlsleiste und hört sofort zu. Der Text erscheint als Suche oder „ProRendo fragen: …“
 - Fehlerfälle mit klarer Meldung: Browser ohne Spracherkennung, Mikrofon verweigert oder nicht vorhanden, Dienst nicht erreichbar
 - Tests: 22 Unit, 75 DB, 16 E2E (neu: Diktat mit simuliertem Mikrofon im Gesprächsmodus inkl. Reload, Sprachbefehl über die Befehlsleiste, Absicherung des Endpunkts)
 
@@ -137,7 +137,7 @@ Offene Punkte: Datumsfelder zeigen das Format des Geräts (auf deutschen Geräte
   - Pilotangebot
   - Team (Einladungen „Demnächst“)
   - Ändern dürfen Inhaber und Admins. Der Server prüft die Rolle, und RLS verhindert die Änderung zusätzlich (0 geänderte Zeilen werden als „nicht erlaubt“ gemeldet)
-- `/einstellungen/protokoll`: Änderungsprotokoll mit Zeitpunkt, Bereich, Aktion, Name des Datensatzes und Feldänderungen alt → neu. Phasen, Personen und Statuswerte erscheinen als Namen. Dazu „vorgeschlagen durch ReQover AI, bestätigt durch …“, Filter nach Mensch/AI und Bereich sowie Blättern
+- `/einstellungen/protokoll`: Änderungsprotokoll mit Zeitpunkt, Bereich, Aktion, Name des Datensatzes und Feldänderungen alt → neu. Phasen, Personen und Statuswerte erscheinen als Namen. Dazu „vorgeschlagen durch ProRendo AI, bestätigt durch …“, Filter nach Mensch/AI und Bereich sowie Blättern
 - Export: `/api/export` liefert alle Daten der Organisation als JSON (Inhaber/Admins), inklusive Änderungsprotokoll und Ereignissen. Von Assistent-Gesprächen enthält er nur die eigenen, weil diese privat sind
 - „Demo-Daten entfernen“ löscht nur als Demo markierte Einträge
 - „Organisation löschen“ (nur Inhaber) verlangt den eingetippten Namen. Die Datenbankfunktion `private.delete_organization` prüft Rolle und Namen selbst und löscht alles per Kaskade, auch Protokoll und Ereignisse. Migration 0005 sorgt dafür, dass das Audit beim Löschen der ganzen Organisation nicht scheitert

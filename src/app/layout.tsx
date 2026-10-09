@@ -6,12 +6,12 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' })
 
 export const metadata: Metadata = {
-  title: { default: 'ReQover OS', template: '%s · ReQover OS' },
+  title: { default: 'ProRendo OS', template: '%s · ProRendo OS' },
   description: 'Das Betriebssystem für Sales Recovery.',
-  applicationName: 'ReQover OS',
+  applicationName: 'ProRendo OS',
   robots: { index: false, follow: false },
   icons: { apple: '/icons/apple-touch-icon.png' },
-  appleWebApp: { capable: true, title: 'ReQover', statusBarStyle: 'black' },
+  appleWebApp: { capable: true, title: 'ProRendo', statusBarStyle: 'black' },
   formatDetection: { telephone: false },
 }
 

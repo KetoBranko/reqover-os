@@ -1,6 +1,6 @@
 # Sicherheit und Datenschutz – Stand Phase 12
 
-Diese Seite beschreibt, wie ReQover OS gebaut ist, nicht welche Zertifizierungen es hat. Es gibt keine. Ob der Betrieb die DSGVO erfüllt, hängt zusätzlich von Hosting, Verträgen (AV-Verträge mit Anbietern) und Prozessen ab. Das kann der Code allein nicht leisten.
+Diese Seite beschreibt, wie ProRendo OS gebaut ist, nicht welche Zertifizierungen es hat. Es gibt keine. Ob der Betrieb die DSGVO erfüllt, hängt zusätzlich von Hosting, Verträgen (AV-Verträge mit Anbietern) und Prozessen ab. Das kann der Code allein nicht leisten.
 
 ## Zugriff
 
@@ -29,7 +29,7 @@ Diese Seite beschreibt, wie ReQover OS gebaut ist, nicht welche Zertifizierungen
 
 - Secrets kommen nur aus Umgebungsvariablen und werden ausschließlich serverseitig gelesen (`src/server/env.ts`, `server-only`). Im Browser landet nur die öffentliche Supabase-URL mit dem Anon-Key.
 - `.env*` ist von Git ausgeschlossen (außer `.env.example` ohne Werte). Die Passwörter in `db/local/` und in den Testskripten gelten nur für die lokale Entwicklungsdatenbank.
-- Testmodus-Anbieter (`AI_PROVIDER=fake`, `STT_PROVIDER=fake`) und die Testuhr (Cookie `reqover-testzeit`) wirken nur mit `APP_ENV=test`; Demo-Daten lassen sich in Produktion nicht einspielen.
+- Testmodus-Anbieter (`AI_PROVIDER=fake`, `STT_PROVIDER=fake`) und die Testuhr (Cookie `prorendo-testzeit`) wirken nur mit `APP_ENV=test`; Demo-Daten lassen sich in Produktion nicht einspielen.
 
 ## AI und Spracheingabe: welche Daten wohin gehen
 

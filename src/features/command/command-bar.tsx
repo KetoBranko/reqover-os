@@ -13,7 +13,7 @@ import { DictateButton } from '@/features/voice/dictate'
 import { useVoiceMode } from '@/features/voice/voice-config'
 import type { SearchHit } from '@/server/services/search'
 
-const OPEN_EVENT = 'reqover:command-open'
+const OPEN_EVENT = 'prorendo:command-open'
 
 /** Round launcher for the mobile bottom bar; opens the same command bar. */
 export function CommandLauncher() {
@@ -139,7 +139,7 @@ export function CommandBar() {
                 <Command.Input
                   value={query}
                   onValueChange={onQueryChange}
-                  placeholder="Suchen, Aktion wählen oder ReQover fragen …"
+                  placeholder="Suchen, Aktion wählen oder ProRendo fragen …"
                   className="h-12 flex-1 bg-transparent text-[15px] text-fg outline-none placeholder:text-faint"
                 />
                 {searching && <span className="text-[12px] text-faint">{de.common.loading}</span>}
@@ -191,16 +191,16 @@ export function CommandBar() {
 
                 {query.trim().length >= 3 && (
                   <Command.Group heading="Assistent" className={GROUP} forceMount>
-                    <Command.Item value="ReQover fragen" forceMount onSelect={() => go(`/assistent?frage=${encodeURIComponent(query.trim())}`)} className={ITEM}>
+                    <Command.Item value="ProRendo fragen" forceMount onSelect={() => go(`/assistent?frage=${encodeURIComponent(query.trim())}`)} className={ITEM}>
                       <Sparkles className="size-4 text-accent" aria-hidden />
-                      <span className="min-w-0 flex-1 truncate">ReQover fragen: „{query.trim()}“</span>
+                      <span className="min-w-0 flex-1 truncate">ProRendo fragen: „{query.trim()}“</span>
                     </Command.Item>
                   </Command.Group>
                 )}
               </Command.List>
               <div className="hidden items-center justify-between border-t border-line px-4 py-2 text-[11px] text-faint sm:flex">
                 <span>↑↓ auswählen · ↵ öffnen · Esc schließen</span>
-                <span>Freitext stellt eine Frage an ReQover</span>
+                <span>Freitext stellt eine Frage an ProRendo</span>
               </div>
             </Command>
           </D.Content>

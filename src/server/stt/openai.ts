@@ -1,7 +1,7 @@
 import 'server-only'
 import type { STTProvider } from './provider'
 
-/** OpenAI transcription API (plain fetch, no SDK). Audio is sent for transcription only and not stored by ReQover. */
+/** OpenAI transcription API (plain fetch, no SDK). Audio is sent for transcription only and not stored by ProRendo. */
 export function openaiSTT(apiKey: string, model: string): STTProvider {
   return {
     id: 'openai',
